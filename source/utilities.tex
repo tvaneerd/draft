@@ -18389,28 +18389,28 @@ namespace std {
               basic_string<charT, traits, Alloc>& abbrev, minutes& offset);
 
     // calendrical constants
-    inline constexpr chrono::last_spec last{};
+    inline constexpr last_spec last{};
 
-    inline constexpr chrono::weekday Sunday{0};
-    inline constexpr chrono::weekday Monday{1};
-    inline constexpr chrono::weekday Tuesday{2};
-    inline constexpr chrono::weekday Wednesday{3};
-    inline constexpr chrono::weekday Thursday{4};
-    inline constexpr chrono::weekday Friday{5};
-    inline constexpr chrono::weekday Saturday{6};
+    inline constexpr weekday Sunday{0};
+    inline constexpr weekday Monday{1};
+    inline constexpr weekday Tuesday{2};
+    inline constexpr weekday Wednesday{3};
+    inline constexpr weekday Thursday{4};
+    inline constexpr weekday Friday{5};
+    inline constexpr weekday Saturday{6};
 
-    inline constexpr chrono::month January{1};
-    inline constexpr chrono::month February{2};
-    inline constexpr chrono::month March{3};
-    inline constexpr chrono::month April{4};
-    inline constexpr chrono::month May{5};
-    inline constexpr chrono::month June{6};
-    inline constexpr chrono::month July{7};
-    inline constexpr chrono::month August{8};
-    inline constexpr chrono::month September{9};
-    inline constexpr chrono::month October{10};
-    inline constexpr chrono::month November{11};
-    inline constexpr chrono::month December{12};
+    inline constexpr month January{1};
+    inline constexpr month February{2};
+    inline constexpr month March{3};
+    inline constexpr month April{4};
+    inline constexpr month May{5};
+    inline constexpr month June{6};
+    inline constexpr month July{7};
+    inline constexpr month August{8};
+    inline constexpr month September{9};
+    inline constexpr month October{10};
+    inline constexpr month November{11};
+    inline constexpr month December{12};
   }
 
   inline namespace literals {
@@ -21325,6 +21325,753 @@ the \tcode{clock_cast} is ambiguous and the program is ill-formed.
 \returns
 The best well-formed clock time conversion expression in the above list.
 \end{itemdescr}
+
+\rSec2[time.format]{Formatting}
+
+\pnum
+Each \tcode{format} overload specified in this section
+calls \tcode{to_stream} unqualified,
+so as to enable argument dependent lookup\iref{basic.lookup.argdep}.
+
+\indexlibrary{\idxcode{format}|(}%
+\begin{itemdecl}
+template <class charT, class Streamable>
+  basic_string<charT>
+    format(const charT* fmt, const Streamable& s);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+to_stream(declval<basic_ostream<charT>&>(), fmt, s)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\effects
+Constructs a local variable of type
+\tcode{basic_ostringstream<charT>}
+(named \tcode{os} for exposition purposes).
+Executes \tcode{os.exceptions(ios::failbit | ios::badbit)}.
+Then calls \tcode{to_stream(os, fmt, s)}.
+
+\pnum
+\returns \tcode{os.str()}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template <class charT, class Streamable>
+  basic_string<charT>
+    format(const locale& loc, const charT* fmt, const Streamable& s);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+to_stream(declval<basic_ostream<charT>&>(), fmt, s)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\effects
+Constructs a local variable of type
+\tcode{basic_ostringstream<charT>}
+(named \tcode{os} for exposition purposes).
+Executes \tcode{os.exceptions(ios::failbit | ios::badbit)}.
+Then calls \tcode{os.imbue(loc)}.
+Then calls \tcode{to_stream(os, fmt, s)}.
+
+\pnum
+\returns \tcode{os.str()}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template <class charT, class traits, class Alloc, class Streamable>
+  basic_string<charT, traits, Alloc>
+    format(const basic_string<charT, traits, Alloc>& fmt, const Streamable& s);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+to_stream(declval<basic_ostringstream<charT, traits, Alloc>&>(), fmt.c_str(), s)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\effects
+Constructs a local variable of type
+\tcode{basic_ostringstream<charT, traits, Alloc>}
+(named \tcode{os} for exposition purposes).
+Executes \tcode{os.exceptions(ios::failbit | ios::badbit)}.
+Then calls \tcode{to_stream(os, fmt.c_str(), s)}.
+
+\pnum
+\returns \tcode{os.str()}.
+\end{itemdescr}
+
+\indexlibrarymember{}{}%
+\begin{itemdecl}
+template <class charT, class traits, class Alloc, class Streamable>
+  basic_string<charT, traits, Alloc>
+    format(const locale& loc, const basic_string<charT, traits, Alloc>& fmt, const Streamable& s);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+to_stream(declval<basic_ostringstream<charT, traits, Alloc>&>(), fmt.c_str(), s)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\effects
+Constructs a local variable of type
+\tcode{basic_ostringstream<charT, traits, Alloc>}
+(named \tcode{os} for exposition purposes).
+Then calls \tcode{os.imbue(loc)}.
+Executes \tcode{os.exceptions(ios::failbit | ios::badbit)}.
+Then calls \tcode{to_stream(os, fmt.c_str(), s)}.
+
+\pnum
+\returns \tcode{os.str()}.
+\end{itemdescr}
+
+\pnum
+The \tcode{format} functions call a \tcode{to_stream} function with
+a \tcode{basic_ostream},
+a formatting string specifier,
+and a \tcode{Streamable} argument.
+Each \tcode{to_stream} overload is customized for each \tcode{Streamable} type.
+However all \tcode{to_stream} overloads
+treat the formatting string specifier
+according to the following specification:
+
+\pnum
+The \tcode{fmt} string consists of zero or more conversion specifiers
+and ordinary multibyte characters.
+A conversion specifier consists of
+a \tcode{\%} character,
+possibly followed by an \tcode{E} or \tcode{O} modifier character (described below),
+followed by a character that determines the behavior of the conversion specifier.
+All ordinary multibyte characters (excluding the terminating null character)
+are streamed unchanged into the \tcode{basic_ostream}.
+
+\pnum
+Each conversion specifier is replaced by appropriate characters
+as described in Table~\ref{tab:time.format.spec}.
+Some of the conversion specifiers
+depend on the locale which is imbued to the \tcode{basic_ostream}.
+If the \tcode{Streamable} object does not contain
+the information the conversion specifier refers to,
+the value streamed to the \tcode{basic_ostream} is unspecified.
+
+\pnum
+Unless explicitly specified,
+\tcode{Streamable} types will not contain time zone abbreviation
+and time zone offset information.
+If available,
+the conversion specifiers \tcode{\%Z} and \tcode{\%z}
+will format this information (respectively).
+If the information is not available,
+and \tcode{\%Z} or \tcode{\%z} are contained in \tcode{fmt},
+\tcode{os.setstate(ios_base::failbit)} shall be called.
+
+\begin{LongTable}{Meaning of \tcode{format} conversion specifiers}{tab:time.format.spec}{lx{.8\hsize}}
+\\ \topline
+\lhdr{Specifier} & \rhdr{Replacement} \\ \capsep
+\endfirsthead
+\continuedcaption\\
+\hline
+\lhdr{Specifier} & \rhdr{Replacement} \\ \capsep
+\endhead
+\tcode{\%a} &
+The locale's abbreviated weekday name.
+If the value does not contain a valid weekday,
+\tcode{setstate(ios::failbit)} is called.
+\\ \rowsep
+\tcode{\%A} &
+The locale's full weekday name.
+If the value does not contain a valid weekday,
+\tcode{setstate(ios::failbit)} is called.
+\\ \rowsep
+\tcode{\%b} &
+The locale's abbreviated month name.
+If the value does not contain a valid month,
+\tcode{setstate(ios::failbit)} is called.
+\\ \rowsep
+\tcode{\%B} &
+The locale's full month name.
+If the value does not contain a valid month,
+\tcode{setstate(ios::failbit)} is called.
+\\ \rowsep
+\tcode{\%c} &
+The locale's date and time representation.
+The modified command \tcode{\%Ec} produces
+the locale's alternate date and time representation.
+\\ \rowsep
+\tcode{\%C} &
+The year divided by 100 using floored division.
+If the result is a single decimal digit,
+it is prefixed with \tcode{0}.
+The modified command \tcode{\%EC} produces
+the locale's alternative representation of the century.
+\\ \rowsep
+\tcode{\%d} &
+The day of month as a decimal number.
+If the result is a single decimal digit,
+it is prefixed with \tcode{0}.
+The modified command \tcode{\%Od} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%D} &
+Equivalent to \tcode{\%m/\%d/\%y}.
+\\ \rowsep
+\tcode{\%e} &
+The day of month as a decimal number.
+If the result is a single decimal digit,
+it is prefixed with a space.
+The modified command \tcode{\%Oe} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%F} &
+Equivalent to \tcode{\%Y-\%m-\%d}.
+\\ \rowsep
+\tcode{\%g} &
+The last two decimal digits of the ISO week-based year.
+If the result is a single digit it is prefixed by \tcode{0}.
+\\ \rowsep
+\tcode{\%G} &
+The ISO week-based year as a decimal number.
+If the result is less than four digits
+it is left-padded with \tcode{0} to four digits.
+\\ \rowsep
+\tcode{\%h} &
+Equivalent to \tcode{\%b}.
+\\ \rowsep
+\tcode{\%H} &
+The hour (24-hour clock) as a decimal number.
+If the result is a single digit,
+it is prefixed with \tcode{0}.
+The modified command \tcode{\%OH} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%I} &
+The hour (12-hour clock) as a decimal number.
+If the result is a single digit,
+it is prefixed with \tcode{0}.
+The modified command \tcode{\%OI} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%j} &
+The day of the year as a decimal number.
+Jan 1 is \tcode{001}.
+If the result is less than three digits,
+it is left-padded with \tcode{0} to three digits.
+\\ \rowsep
+\tcode{\%m} &
+The month as a decimal number.
+Jan is \tcode{01}.
+If the result is a single digit, it is prefixed with \tcode{0}.
+The modified command \tcode{\%Om} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%M} &
+The minute as a decimal number.
+If the result is a single digit, it is prefixed with \tcode{0}.
+The modified command \tcode{\%OM} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%n} &
+A new-line character.
+\\ \rowsep
+\tcode{\%p} &
+The locale's equivalent of the AM/PM designations associated with a 12-hour clock.
+\\ \rowsep
+\tcode{\%r} &
+The locale's 12-hour clock time.
+\\ \rowsep
+\tcode{\%R} &
+Equivalent to \tcode{\%H:\%M}.
+\\ \rowsep
+\tcode{\%S} &
+Seconds as a decimal number.
+If the number of seconds is less than \tcode{10}, the result is prefixed with \tcode{0}.
+If the precision of the input can not be exactly represented with seconds,
+then the format is a decimal floating point number with a fixed format
+and a precision matching that of the precision of the input
+(or to a microseconds precision if the conversion to floating point decimal seconds
+cannot be made within 18 fractional digits).
+The character for the decimal point is localized according to the locale.
+The modified command \tcode{\%OS} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%t} &
+A horizontal-tab character.
+\\ \rowsep
+\tcode{\%T} &
+Equivalent to \tcode{\%H:\%M:\%S}.
+\\ \rowsep
+\tcode{\%u} &
+The ISO weekday as a decimal number (\tcode{1}-\tcode{7}),
+where Monday is \tcode{1}.
+The modified command \tcode{\%Ou} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%U} &
+The week number of the year as a decimal number.
+The first Sunday of the year is the first day of week \tcode{01}.
+Days of the same year prior to that are in week \tcode{00}.
+If the result is a single digit, it is prefixed with \tcode{0}.
+The modified command \tcode{\%OU} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%V} &
+The ISO week-based week number as a decimal number.
+If the result is a single digit, it is prefixed with \tcode{0}.
+The modified command \tcode{\%OV} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%w} &
+The weekday as a decimal number (\tcode{0}-\tcode{6}), where Sunday is \tcode{0}.
+The modified command \tcode{\%Ow} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%W} &
+The week number of the year as a decimal number.
+The first Monday of the year is the first day of week \tcode{01}.
+Days of the same year prior to that are in week \tcode{00}.
+If the result is a single digit, it is prefixed with \tcode{0}.
+The modified command \tcode{\%OW} produces
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%x} &
+The locale's date representation.
+The modified command \tcode{\%Ex} produces
+the locale's alternate date representation.
+\\ \rowsep
+\tcode{\%X} &
+The locale's time representation.
+The modified command \tcode{\%EX} produces
+the locale's alternate time representation.
+\\ \rowsep
+\tcode{\%y} &
+The last two decimal digits of the year.
+If the result is a single digit it is prefixed by \tcode{0}.
+\\ \rowsep
+\tcode{\%Y} &
+The year as a decimal number.
+If the result is less than four digits
+it is left-padded with \tcode{0} to four digits.
+\\ \rowsep
+\tcode{\%z} &
+The offset from UTC in the ISO 8601 format.
+For example \tcode{-0430} refers to 4 hours 30 minutes behind UTC.
+If the offset is zero, \tcode{+0000} is used.
+The modified commands \tcode{\%Ez} and  \tcode{\%Oz}
+insert a \tcode{:} between the hours and minutes: \tcode{-04:30}.
+If the offset information is not available,
+\tcode{setstate(ios_base::failbit)} shall be called.
+\\ \rowsep
+\tcode{\%Z} &
+The time zone abbreviation.
+If the time zone abbreviation is not available,
+\tcode{setstate(ios_base::failbit)} shall be called.
+\\ \rowsep
+\tcode{\%\%} &
+A \tcode{\%} character.
+\\
+\end{LongTable}
+
+\indexlibrary{\idxcode{format}|)}%
+
+\rSec2[time.parse]{Parsing}
+
+\indexlibrary{\idxcode{parse}|(}%
+
+\pnum
+Each \tcode{parse} overload specified in this section
+calls \tcode{from_stream} unqualified,
+so as to enable argument dependent lookup\iref{basic.lookup.argdep}.
+
+\begin{itemdecl}
+template <class charT, class traits, class Alloc, class Parsable>
+  @\unspec@
+    parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+from_stream(declval<basic_istream<charT, traits>&>(), fmt.c_str(), tp)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\returns
+A manipulator that, when extracted from a
+\tcode{basic_istream<charT, traits>} \tcode{is},
+calls \tcode{from_stream(is, fmt.c_str(), tp)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template <class charT, class traits, class Alloc, class Parsable>
+  @\unspec@
+    parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp,
+          basic_string<charT, traits, Alloc>& abbrev);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+from_stream(declval<basic_istream<charT, traits>&>(), fmt.c_str(), tp, &abbrev)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\returns
+A manipulator that, when extracted from a
+\tcode{basic_istream<charT, traits>} \tcode{is},
+calls \tcode{from_stream(is, fmt.c_str(), tp, \&abbrev)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template <class charT, class traits, class Alloc, class Parsable>
+  @\unspec@
+    parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp,
+          minutes& offset);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+from_stream(declval<basic_istream<charT, traits>&>(), fmt.c_str(), tp, nullptr, &offset)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\returns
+A manipulator that, when extracted from a
+\tcode{basic_istream<charT, traits>} \tcode{is},
+calls \tcode{from_stream(is, fmt.c_str(), tp, nullptr, \&offset)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template <class charT, class traits, class Alloc, class Parsable>
+  @\unspec@
+    parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp,
+          basic_string<charT, traits, Alloc>& abbrev, minutes& offset);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function shall not participate in overload resolution unless
+\begin{codeblock}
+from_stream(declval<basic_istream<charT, traits>&>(), fmt.c_str(), tp, &abbrev, &offset)
+\end{codeblock}
+is a valid expression.
+
+\pnum
+\returns
+A manipulator that, when extracted from a
+\tcode{basic_istream<charT, traits>} \tcode{is},
+calls \tcode{from_stream(is, fmt.c_str(), tp, \&abbrev, \&offset)}.
+\end{itemdescr}
+
+\pnum
+All \tcode{from_stream} overloads behave as unformatted input functions,
+except that they have an unspecified effect
+on the value returned by subsequent calls to \tcode{basic_istream<>::gcount()}.
+Each overload takes a format string containing ordinary characters
+and flags which have special meaning.
+Each flag begins with a \tcode{\%}.
+Some flags can be modified by \tcode{E} or \tcode{O}.
+During parsing each flag interprets characters as parts of date and time types
+according to the table below.
+Some flags can be modified by a width parameter
+given as a positive decimal integer called out as \tcode{\placeholder{N}} below
+which governs how many characters are parsed from the stream in interpreting the flag.
+All characters in the format string that are not represented in the table below,
+except for white space, are parsed unchanged from the stream.
+A white space character matches zero or more white space characters in the input stream.
+
+\pnum
+If the \tcode{from_stream} overload fails to parse
+everything specified by the format string,
+or if insufficient information is parsed to specify a complete
+duration, time point, or calendrical data structure,
+\tcode{setstate(ios_base::failbit)}
+is called on the \tcode{basic_istream}.
+
+\begin{LongTable}{Meaning of \tcode{parse} flags}{tab:time.parse.spec}{lx{.8\hsize}}
+\\ \topline
+\lhdr{Flag} & \rhdr{Parsed value} \\ \capsep
+\endfirsthead
+\continuedcaption\\
+\hline
+\lhdr{Flag} & \rhdr{Parsed value} \\ \capsep
+\endhead
+\tcode{\%a} &
+The locale's full or abbreviated case-insensitive weekday name.
+\\ \rowsep
+\tcode{\%A} &
+Equivalent to \tcode{\%a}.
+\\ \rowsep
+\tcode{\%b} &
+The locale's full or abbreviated case-insensitive month name.
+\\ \rowsep
+\tcode{\%B} &
+Equivalent to \tcode{\%b}.
+\\ \rowsep
+\tcode{\%c} &
+The locale's date and time representation.
+The modified command \tcode{\%Ec} interprets
+the locale's alternate date and time representation.
+\\ \rowsep
+\tcode{\%C} &
+The century as a decimal number.
+The modified command \tcode{\%\placeholder{N}C} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+The modified commands \tcode{\%EC} and \tcode{\%OC} interpret
+the locale's alternative representation of the century.
+\\ \rowsep
+\tcode{\%d} &
+The day of the month as a decimal number.
+The modified command \tcode{\%\placeholder{N}d} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%Ed} interprets
+the locale's alternative representation of the day of the month.
+\\ \rowsep
+\tcode{\%D} &
+Equivalent to \tcode{\%m/\%d/\%y}.
+\\ \rowsep
+\tcode{\%e} &
+Equivalent to \tcode{\%d} and can be modified like \tcode{\%d}.
+\\ \rowsep
+\tcode{\%F} &
+Equivalent to \tcode{\%Y-\%m-\%d}.
+If modified with a width \tcode{\placeholder{N}},
+the width is applied to only \tcode{\%Y}.
+\\ \rowsep
+\tcode{\%g} &
+The last two decimal digits of the ISO week-based year.
+The modified command \tcode{\%\placeholder{N}g} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+\\ \rowsep
+\tcode{\%G} &
+The ISO week-based year as a decimal number.
+The modified command \tcode{\%\placeholder{N}G} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 4.
+Leading zeroes are permitted but not required.
+\\ \rowsep
+\tcode{\%h} &
+Equivalent to \tcode{\%b}.
+\\ \rowsep
+\tcode{\%H} &
+The hour (24-hour clock) as a decimal number.
+The modified command \tcode{\%\placeholder{N}H} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%OH} interprets
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%I} &
+The hour (12-hour clock) as a decimal number.
+The modified command \tcode{\%\placeholder{N}I} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+\\ \rowsep
+\tcode{\%j} &
+The day of the year as a decimal number.
+Jan 1 is \tcode{1}.
+The modified command \tcode{\%\placeholder{N}j} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 3.
+Leading zeroes are permitted but not required.
+\\ \rowsep
+\tcode{\%m} &
+The month as a decimal number.
+Jan is \tcode{1}.
+The modified command \tcode{\%\placeholder{N}m} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%Om} interprets
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%M} &
+The minutes as a decimal number.
+The modified command \tcode{\%\placeholder{N}M} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%OM} interprets
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%n} &
+Matches one white space character.
+\begin{note}
+\tcode{\%n}, \tcode{\%t}, and a space
+can be combined to match a wide range of white-space patterns.
+For example,
+\tcode{"\%n "} matches one or more white space characters, and
+\tcode{"\%n\%t\%t"} matches one to three white space characters.
+\end{note}
+\\ \rowsep
+\tcode{\%p} &
+The locale's equivalent of the AM/PM designations associated with a 12-hour clock.
+The command \tcode{\%I} must precede \tcode{\%p} in the format string.
+\\ \rowsep
+\tcode{\%r} &
+The locale's 12-hour clock time.
+\\ \rowsep
+\tcode{\%R} &
+Equivalent to \tcode{\%H:\%M}.
+\\ \rowsep
+\tcode{\%S} &
+The seconds as a decimal number.
+The modified command \tcode{\%\placeholder{N}S} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified,
+the default is 2 if the input time has a precision convertible to seconds.
+Otherwise the default width is determined by
+the decimal precision of the input
+and the field is interpreted as a \tcode{long double} in a fixed format.
+If encountered, the locale determines the decimal point character.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%OS} interprets
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%t} &
+Matches zero or one white space characters.
+\\ \rowsep
+\tcode{\%T} &
+Equivalent to \tcode{\%H:\%M:\%S}.
+\\ \rowsep
+\tcode{\%u} &
+The ISO weekday as a decimal number (\tcode{1}-\tcode{7}), where Monday is \tcode{1}.
+The modified command \tcode{\%\placeholder{N}u} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is \tcode{1}.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%Ou} interprets
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%U} &
+The week number of the year as a decimal number.
+The first Sunday of the year is the first day of week \tcode{01}.
+Days of the same year prior to that are in week \tcode{00}.
+The modified command \tcode{\%\placeholder{N}U} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+\\ \rowsep
+\tcode{\%V} &
+The ISO week-based week number as a decimal number.
+The modified command \tcode{\%\placeholder{N}V} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+\\ \rowsep
+\tcode{\%w} &
+The weekday as a decimal number (\tcode{0}-\tcode{6}), where Sunday is \tcode{0}.
+The modified command \tcode{\%\placeholder{N}w} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is \tcode{1}.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%Ow} interprets
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%W} &
+The week number of the year as a decimal number.
+The first Monday of the year is the first day of week \tcode{01}.
+Days of the same year prior to that are in week \tcode{00}.
+The modified command \tcode{\%\placeholder{N}W} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+\\ \rowsep
+\tcode{\%x} &
+The locale's date representation.
+The modified command \tcode{\%Ex} produces the locale's alternate date representation.
+\\ \rowsep
+\tcode{\%X} &
+The locale's time representation.
+The modified command \tcode{\%EX} produces the locale's alternate time representation.
+\\ \rowsep
+\tcode{\%y} &
+The last two decimal digits of the year.
+If the century is not otherwise specified
+(e.g.  with \tcode{\%C}),
+values in the range \crange{69}{99}
+are presumed to refer to the years 1969 to 1999,
+and values in the range \crange{00}{68}
+are presumed to refer to the years 2000 to 2068.
+The modified command \tcode{\%\placeholder{N}y} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 2.
+Leading zeroes are permitted but not required.
+The modified commands \tcode{\%Ey} and \tcode{\%Oy} interpret
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%Y} &
+The year as a decimal number.
+The modified command \tcode{\%\placeholder{N}Y} specifies
+the maximum number of characters to read.
+If \tcode{\placeholder{N}} is not specified, the default is 4.
+Leading zeroes are permitted but not required.
+The modified command \tcode{\%EY} interprets
+the locale's alternative representation.
+\\ \rowsep
+\tcode{\%z} &
+The offset from UTC in the format \tcode{[+|-]hh[mm]}.
+For example \tcode{-0430} refers to 4 hours 30 minutes behind UTC,
+and \tcode{04} refers to 4 hours ahead of UTC.
+The modified commands \tcode{\%Ez} and \tcode{\%Oz}
+parse a \tcode{:} between the hours and minutes
+and render leading zeroes on the hour field optional:
+\tcode{[+|-]h[h][:mm]}.
+For example \tcode{-04:30} refers to 4 hours 30 minutes behind UTC,
+and \tcode{4} refers to 4 hours ahead of UTC.
+\\ \rowsep
+\tcode{\%Z} &
+The time zone abbreviation or name.
+A single word is parsed.
+This word can only contain characters
+from the basic source character set\iref{lex.charset}
+that are alphanumeric, or one of
+\tcode{'_'}, \tcode{'/'}, \tcode{'-'}, or \tcode{'+'}.
+\\ \rowsep
+\tcode{\%\%} &
+A \tcode{\%} character is extracted.
+\\
+\end{LongTable}
+
+\indexlibrary{\idxcode{parse}|)}
 
 \rSec2[ctime.syn]{Header \tcode{<ctime>} synopsis}
 
