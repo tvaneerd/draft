@@ -17460,7 +17460,32 @@ utilities.
 \rSec2[time.syn]{Header \tcode{<chrono>} synopsis}
 
 \indexhdr{chrono}%
+\indexlibrary{\idxcode{treat_as_floating_point_v}}%
 \indexlibrary{\idxcode{is_clock_v}}%
+\indexlibrary{\idxcode{nanoseconds}}%
+\indexlibrary{\idxcode{microseconds}}%
+\indexlibrary{\idxcode{milliseconds}}%
+\indexlibrary{\idxcode{seconds}}%
+\indexlibrary{\idxcode{minutes}}%
+\indexlibrary{\idxcode{hours}}%
+\indexlibrary{\idxcode{days}}%
+\indexlibrary{\idxcode{weeks}}%
+\indexlibrary{\idxcode{years}}%
+\indexlibrary{\idxcode{months}}%
+\indexlibrary{\idxcode{sys_time}}%
+\indexlibrary{\idxcode{sys_seconds}}%
+\indexlibrary{\idxcode{sys_days}}%
+\indexlibrary{\idxcode{utc_time}}%
+\indexlibrary{\idxcode{utc_seconds}}%
+\indexlibrary{\idxcode{tai_time}}%
+\indexlibrary{\idxcode{tai_seconds}}%
+\indexlibrary{\idxcode{gps_time}}%
+\indexlibrary{\idxcode{gps_seconds}}%
+\indexlibrary{\idxcode{file_time}}%
+\indexlibrary{\idxcode{local_time}}%
+\indexlibrary{\idxcode{local_seconds}}%
+\indexlibrary{\idxcode{local_days}}%
+\indexlibrary{\idxcode{local_t}}%
 \begin{codeblock}
 namespace std {
   namespace chrono {
@@ -17745,7 +17770,7 @@ namespace std {
     // \ref{time.clock.hires}, class \tcode{high_resolution_clock}
     class high_resolution_clock;
 
-    // \ref{time.clock.local}, class \tcode{local_time}
+    // \ref{time.clock.local}, local time
     struct local_t {};
     template<class Duration>
       using local_time  = time_point<local_t, Duration>;
@@ -17772,8 +17797,7 @@ namespace std {
       struct clock_time_conversion;
 
     template<class DestClock, class SourceClock, class Duration>
-      time_point<DestClock, see below>
-        clock_cast(const time_point<SourceClock, Duration>& t);
+      auto clock_cast(const time_point<SourceClock, Duration>& t);
 
     // \ref{time.calendar.last}, class \tcode{last_spec}
     struct last_spec;
@@ -18633,7 +18657,7 @@ clock as the two types and the common type of their two \tcode{duration}s.
 
 \indexlibrary{\idxcode{is_clock}}%
 \begin{itemdecl}
-template <class T> struct is_clock;
+template<class T> struct is_clock;
 \end{itemdecl}
 
 \pnum
@@ -19438,7 +19462,7 @@ otherwise return \tcode{-d}.
 
 \indexlibrarymember{operator<<}{duration}%
 \begin{itemdecl}
-template <class charT, class traits, class Rep, class Period>
+template<class charT, class traits, class Rep, class Period>
   basic_ostream<charT, traits>&
     operator<<(basic_ostream<charT, traits>& os, const duration<Rep, Period>& d);
 \end{itemdecl}
@@ -19503,7 +19527,7 @@ The implementation may substitute other encodings, including \tcode{"us"}.
 
 \indexlibrarymember{to_stream}{duration}%
 \begin{itemdecl}
-template <class charT, class traits, class Rep, class Period>
+template<class charT, class traits, class Rep, class Period>
   basic_ostream<charT, traits>&
     to_stream(basic_ostream<charT, traits>& os, const charT* fmt,
               const duration<Rep, Period>& d);
@@ -19522,7 +19546,7 @@ using the format specified by the NTCTS \tcode{fmt}.
 
 \indexlibrarymember{from_stream}{duration}%
 \begin{itemdecl}
-template <class charT, class traits, class Rep, class Period, class Alloc = allocator<charT>>
+template<class charT, class traits, class Rep, class Period, class Alloc = allocator<charT>>
   basic_istream<charT, traits>&
     from_stream(basic_istream<charT, traits>& is, const charT* fmt,
                 duration<Rep, Period>& d,
@@ -19540,9 +19564,9 @@ as specified in \ref{time.parse}.
 If the parse parses everything specified by the parsing format flags without error,
 and yet none of the flags impacts a duration,
 \tcode{d} will be assigned a zero value.
-If \tcode{"\%Z"} is used and successfully parsed,
+If \tcode{\%Z} is used and successfully parsed,
 that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
-If \tcode{"\%z"} (or a modified variant) is used and successfully parsed,
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
 that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 
 \pnum
@@ -19555,39 +19579,45 @@ that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 \begin{codeblock}
 namespace std::chrono {
   template<class Clock, class Duration = typename Clock::duration>
-    class time_point {
-    public:
-      using clock    = Clock;
-      using duration = Duration;
-      using rep      = typename duration::rep;
-      using period   = typename duration::period;
+  class time_point {
+  public:
+    using clock    = Clock;
+    using duration = Duration;
+    using rep      = typename duration::rep;
+    using period   = typename duration::period;
 
-    private:
-      duration d_;                                              // \expos
+  private:
+    duration d_;                                                // \expos
 
-    public:
-      // \ref{time.point.cons}, construct
-      constexpr time_point();                                   // has value epoch
-      constexpr explicit time_point(const duration& d);         // same as \tcode{time_point() + d}
-      template<class Duration2>
-        constexpr time_point(const time_point<clock, Duration2>& t);
+  public:
+    // \ref{time.point.cons}, construct
+    constexpr time_point();                                     // has value epoch
+    constexpr explicit time_point(const duration& d);           // same as \tcode{time_point() + d}
+    template<class Duration2>
+      constexpr time_point(const time_point<clock, Duration2>& t);
 
-      // \ref{time.point.observer}, observer
-      constexpr duration time_since_epoch() const;
+    // \ref{time.point.observer}, observer
+    constexpr duration time_since_epoch() const;
 
-      // \ref{time.point.arithmetic}, arithmetic
-      constexpr time_point& operator+=(const duration& d);
-      constexpr time_point& operator-=(const duration& d);
+    // \ref{time.point.arithmetic}, arithmetic
+    constexpr time_point& operator++();
+    constexpr time_point operator++(int);
+    constexpr time_point& operator--();
+    constexpr time_point operator--(int);
+    constexpr time_point& operator+=(const duration& d);
+    constexpr time_point& operator-=(const duration& d);
 
-      // \ref{time.point.special}, special values
-      static constexpr time_point min();
-      static constexpr time_point max();
+    // \ref{time.point.special}, special values
+    static constexpr time_point min();
+    static constexpr time_point max();
   };
 }
 \end{codeblock}
 
 \pnum
-\tcode{Clock} shall meet the Clock requirements\iref{time.clock.req}.
+\tcode{Clock} shall either
+meet the Clock requirements\iref{time.clock.req}
+or be the type \tcode{local_t}.
 
 \pnum
 If \tcode{Duration} is not an instance of \tcode{duration},
@@ -19648,6 +19678,52 @@ constexpr duration time_since_epoch() const;
 \end{itemdescr}
 
 \rSec3[time.point.arithmetic]{\tcode{time_point} arithmetic}
+
+\indexlibrarymember{operator++}{time_point}%
+\begin{itemdecl}
+constexpr time_point& operator++();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{++d_}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{time_point}%
+\begin{itemdecl}
+constexpr time_point operator++(int);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{time_point\{d_++\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{time_point}%
+\begin{itemdecl}
+constexpr time_point& operator--();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{--d_}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{time_point}%
+\begin{itemdecl}
+constexpr time_point operator--(int);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{time_point\{d_--\}}.
+\end{itemdescr}
 
 \indexlibrarymember{operator+=}{time_point}%
 \begin{itemdecl}
@@ -19897,14 +19973,25 @@ unless \tcode{ToDuration} is a specialization of \tcode{duration}, and
 \pnum
 The types defined in this subclause shall satisfy the
 \tcode{TrivialClock}
-requirements\iref{time.clock.req}.
+requirements\iref{time.clock.req}
+unless otherwise specified.
 
 \rSec3[time.clock.system]{Class \tcode{system_clock}}
 \indexlibrary{\idxcode{system_clock}}%
 
 \pnum
-Objects of class \tcode{system_clock} represent wall clock time from the system-wide
+Objects of type \tcode{system_clock} represent wall clock time from the system-wide
 realtime clock.
+Objects of type \tcode{sys_time<Duration>} measure time since (and before)
+1970-01-01 00:00:00 UTC excluding leap seconds.
+This measure is commonly referred to as \defn{Unix time}.
+This measure facilitates an efficient mapping between
+\tcode{sys_time} and calendar types\iref{time.calendar}.
+\begin{example} \\
+\tcode{sys_seconds\{sys_days\{1970y/January/1\}\}.time_since_epoch()} is \tcode{0s}. \\
+\tcode{sys_seconds\{sys_days\{2000y/January/1\}\}.time_since_epoch()} is \tcode{946'684'800s},
+which is \tcode{10'957 * 86'400s}. \\
+\end{example}
 
 \begin{codeblock}
 namespace std::chrono {
@@ -19967,6 +20054,810 @@ required precision when converting between \tcode{time_t} values and \tcode{time
 whether values are rounded or truncated to the required precision.
 \end{itemdescr}
 
+\indexlibrarymember{operator<<}{sys_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const sys_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This operator shall not participate in overload resolution if
+\tcode{treat_as_floating_point_v<typename Duration::rep>} is \tcode{true},
+or if \tcode{Duration\{1\} >= days\{1\}}.
+
+\pnum
+\effects
+\begin{codeblock}
+auto const dp = floor<days>(tp);
+os << year_month_day{dp} << ' ' << time_of_day{tp-dp};
+\end{codeblock}
+
+\pnum
+\returns \tcode{os}.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+cout << sys_seconds{0s} << '\n';                // 1970-01-01 00:00:00
+cout << sys_seconds{946'684'800s} << '\n';      // 2000-01-01 00:00:00
+cout << sys_seconds{946'688'523s} << '\n';      // 2000-01-01 01:02:03
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{sys_days}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const sys_days& dp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{os << year_month_day\{dp\}}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{sys_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const sys_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams \tcode{tp} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+If \tcode{\%Z} is used, it will be replaced with
+\tcode{"UTC"} widened to \tcode{charT}.
+If \tcode{\%z} is used (or a modified variant of \tcode{\%z}),
+an offset of \tcode{0min} will be formatted.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{sys_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                sys_time<Duration>& tp, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects Attempts to parse the input stream \tcode{is}
+into the \tcode{sys_time} \tcode{tp} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid date,
+\tcode{is.setstate(ios_base::failbit)}
+shall be called and \tcode{tp} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+Additionally, the parsed offset will be subtracted
+from the successfully parsed timestamp
+prior to assigning that difference to \tcode{tp}.
+
+\pnum
+\returns is.
+\end{itemdescr}
+
+\rSec3[time.clock.utc]{Class \tcode{utc_clock}}
+\indexlibrary{\idxcode{utc_clock}}%
+
+\begin{codeblock}
+namespace std::chrono {
+  class utc_clock {
+  public:
+    using rep                       = @\textit{a signed arithmetic type}@;
+    using period                    = ratio<@\unspec@, @\unspec@>;
+    using duration                  = chrono::duration<rep, period>;
+    using time_point                = chrono::time_point<utc_clock>;
+    static constexpr bool is_steady = @\unspec@;
+
+    static time_point now();
+
+    template<class Duration>
+      static sys_time<common_type_t<Duration, seconds>>
+        to_sys(const utc_time<Duration>& t);
+    template<class Duration>
+      static utc_time<common_type_t<Duration, seconds>>
+        from_sys(const sys_time<Duration>& t);
+  };
+}
+\end{codeblock}
+
+\pnum
+In contrast to \tcode{sys_time},
+which does not take leap seconds into account,
+\tcode{utc_clock} and its associated \tcode{time_point}, \tcode{utc_time},
+count time, including leap seconds, since 1970-01-01 00:00:00 UTC.
+\begin{example} \\
+\tcode{clock_cast<utc_clock>(sys_seconds\{sys_days\{1970y/January/1\}\}).time_since_epoch()} is \tcode{0s}. \\
+\tcode{clock_cast<utc_clock>(sys_seconds\{sys_days\{2000y/January/1\}\}).time_since_epoch()} \\
+is \tcode{946'684'822s}, which is \tcode{10'957 * 86'400s + 22s}. \\
+\end{example}
+
+\pnum
+\tcode{utc_clock} is not a TrivialClock
+unless the implementation can guarantee that \tcode{utc_clock::now()}
+does not propagate an exception.
+\begin{note} \tcode{noexcept(from_sys(system_clock::now()))} is \tcode{false}. \end{note}
+
+\indexlibrarymember{now}{utc_clock}%
+\begin{itemdecl}
+static time_point now();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{from_sys(system_clock::now())}, or a more accurate value of \tcode{utc_time}.
+\end{itemdescr}
+
+\indexlibrarymember{to_sys}{utc_clock}%
+\begin{itemdecl}
+template<typename Duration>
+  static sys_time<common_type_t<Duration, seconds>>
+    to_sys(const utc_time<Duration>& u);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A \tcode{sys_time} \tcode{t},
+such that \tcode{from_sys(t) == u} if such a mapping exists.
+Otherwise \tcode{u} represents a \tcode{time_point}
+during a leap second insertion
+and the last representable value of \tcode{sys_time}
+prior to the insertion of the leap second is returned.
+\end{itemdescr}
+
+\indexlibrarymember{from_sys}{utc_clock}%
+\begin{itemdecl}
+template<typename Duration>
+  static utc_time<common_type_t<Duration, seconds>>
+    from_sys(const sys_time<Duration>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A \tcode{utc_time} \tcode{u}, such that
+\tcode{u.time_since_epoch() - t.time_since_epoch()}
+is equal to the number of leap seconds that were inserted
+between \tcode{t} and 1970-01-01.
+If \tcode{t} is exactly the date of leap second insertion,
+then the conversion counts that leap second as inserted.
+
+\begin{example}
+\begin{codeblock}
+auto t = sys_days{July/1/2015} - 2ns;
+auto u = utc_clock::from_sys(t);
+assert(u.time_since_epoch() - t.time_since_epoch() == 25s);
+t += 1ns;
+u = utc_clock::from_sys(t);
+assert(u.time_since_epoch() - t.time_since_epoch() == 25s);
+t += 1ns;
+u = utc_clock::from_sys(t);
+assert(u.time_since_epoch() - t.time_since_epoch() == 26s);
+t += 1ns;
+u = utc_clock::from_sys(t);
+assert(u.time_since_epoch() - t.time_since_epoch() == 26s);
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{utc_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const utc_time<Duration>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Calls \tcode{to_stream(os, fmt, t)},
+where \tcode{fmt} is a string containing \tcode{"\%F \%T"}
+widened to \tcode{charT}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{utc_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const utc_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams \tcode{tp} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+If \tcode{\%Z} is used, it will be replaced with \tcode{"UTC"} widened to \tcode{charT}.
+If \tcode{\%z} is used (or a modified variant of \tcode{\%z}),
+an offset of \tcode{0min} will be formatted.
+If \tcode{tp} represents a time during a leap second insertion,
+and if a seconds field is formatted,
+the integral portion of that format shall be \tcode{"60"} widened to \tcode{charT}.
+
+\pnum
+\returns \tcode{os}.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+auto t = sys_days{July/1/2015} - 500ms;
+auto u = clock_cast<utc_clock>(t);
+for (auto i = 0; i < 8; ++i, u += 250ms)
+  cout << u << " UTC\n";
+\end{codeblock}
+
+Produces this output:
+
+\begin{codeblock}
+2015-06-30 23:59:59.500 UTC
+2015-06-30 23:59:59.750 UTC
+2015-06-30 23:59:60.000 UTC
+2015-06-30 23:59:60.250 UTC
+2015-06-30 23:59:60.500 UTC
+2015-06-30 23:59:60.750 UTC
+2015-07-01 00:00:00.000 UTC
+2015-07-01 00:00:00.250 UTC
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{utc_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                utc_time<Duration>& tp, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Attempts to parse the input stream \tcode{is}
+into the \tcode{utc_time} \tcode{tp} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid date,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{tp} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+Additionally, the parsed offset will be subtracted from
+the successfully parsed timestamp
+prior to assigning that difference to \tcode{tp}.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.clock.tai]{Class \tcode{tai_clock}}
+\indexlibrary{\idxcode{tai_clock}}%
+
+\begin{codeblock}
+namespace std::chrono {
+  class tai_clock {
+  public:
+    using rep                       = @\textit{a signed arithmetic type}@;
+    using period                    = ratio<@\unspec@, @\unspec@>;
+    using duration                  = chrono::duration<rep, period>;
+    using time_point                = chrono::time_point<tai_clock>;
+    static constexpr bool is_steady = @\unspec@;
+
+    static time_point now();
+
+    template<class Duration>
+      static utc_time<common_type_t<Duration, seconds>>
+        to_utc(const tai_time<Duration>&) noexcept;
+    template<class Duration>
+      static tai_time<common_type_t<Duration, seconds>>
+        from_utc(const utc_time<Duration>&) noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+The clock \tcode{tai_clock} measures seconds since 1958-01-01 00:00:00
+and is offset 10s ahead of UTC at this date.
+That is, 1958-01-01 00:00:00 TAI is equivalent to 1957-12-31 23:59:50 UTC.
+Leap seconds are not inserted into TAI.
+Therefore every time a leap second is inserted into UTC,
+UTC falls another second behind TAI.
+For example by 2000-01-01 there had been 22 leap seconds inserted
+so 2000-01-01 00:00:00 UTC is equivalent to 2000-01-01 00:00:32 TAI
+(22s plus the initial 10s offset).
+
+\pnum
+\tcode{tai_clock} is not a TrivialClock
+unless the implementation can guarantee that \tcode{tai_clock::now()}
+does not propagate an exception.
+\begin{note}
+\tcode{noexcept(from_utc(utc_clock::now()))} is \tcode{false}.
+\end{note}
+
+\indexlibrarymember{now}{tai_clock}%
+\begin{itemdecl}
+static time_point now();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{from_utc(utc_clock::now())}, or a more accurate value of \tcode{tai_time}.
+\end{itemdescr}
+
+\indexlibrarymember{to_utc}{tai_clock}%
+\begin{itemdecl}
+template<class Duration>
+  static utc_time<common_type_t<Duration, seconds>>
+    to_utc(const tai_time<Duration>& t) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+utc_time<common_type_t<Duration, seconds>>{t.time_since_epoch()} - 378691210s
+\end{codeblock}
+\begin{note}
+\begin{codeblock}
+378691210s == sys_days{1970y/January/1} - sys_days{1958y/January/1} + 10s
+\end{codeblock}
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{from_utc}{tai_clock}%
+\begin{itemdecl}
+template<class Duration>
+  static tai_time<common_type_t<Duration, seconds>>
+    from_utc(const utc_time<Duration>& t) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+tai_time<common_type_t<Duration, seconds>>{t.time_since_epoch()} + 378691210s
+\end{codeblock}
+\begin{note}
+\begin{codeblock}
+378691210s == sys_days{1970y/January/1} - sys_days{1958y/January/1} + 10s
+\end{codeblock}
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{tai_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const tai_time<Duration>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Calls \tcode{to_stream(os, fmt, t)},
+where \tcode{fmt} is a string containing
+\tcode{"\%F \%T"} widened to \tcode{charT}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{tai_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const tai_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams \tcode{tp} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+If \tcode{\%Z} is used, it will be replaced with \tcode{"TAI"}.
+If \tcode{\%z} is used (or a modified variant of \tcode{\%z}),
+an offset of \tcode{0min} will be formatted.
+The date and time formatted shall be equivalent to
+that formatted by a \tcode{sys_time} initialized with:
+\begin{codeblock}
+sys_time<Duration>{tp.time_since_epoch()} -
+  (sys_days{1970y/January/1} - sys_days{1958y/January/1})
+\end{codeblock}
+
+\pnum
+\returns os.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+auto st = sys_days{2000y/January/1};
+auto tt = clock_cast<tai_clock>(st);
+cout << format("%F %T %Z == ", st) << format("%F %T %Z\n", tt);
+\end{codeblock}
+
+Produces this output:
+
+\begin{codeblock}
+2000-01-01 00:00:00 UTC == 2000-01-01 00:00:32 TAI
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{tai_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                tai_time<Duration>& tp, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Attempts to parse the input stream \tcode{is}
+into the \tcode{tai_time} \tcode{tp} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid date,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{tp} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+Additionally, the parsed offset will be subtracted from
+the successfully parsed timestamp prior to assigning that difference to \tcode{tp}.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.clock.gps]{Class \tcode{gps_clock}}
+\indexlibrary{\idxcode{gps_clock}}%
+
+\begin{codeblock}
+namespace std::chrono {
+  class gps_clock {
+  public:
+    using rep                       = @\textit{a signed arithmetic type}@;
+    using period                    = ratio<@\unspec@, @\unspec@>;
+    using duration                  = chrono::duration<rep, period>;
+    using time_point                = chrono::time_point<gps_clock>;
+    static constexpr bool is_steady = @\unspec@;
+
+    static time_point now();
+
+    template<class Duration>
+      static utc_time<common_type_t<Duration, seconds>>
+        to_utc(const gps_time<Duration>&) noexcept;
+    template<class Duration>
+      static gps_time<common_type_t<Duration, seconds>>
+        from_utc(const utc_time<Duration>&) noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+The clock \tcode{gps_clock} measures
+seconds since the first Sunday of January, 1980 00:00:00 UTC.
+Leap seconds are not inserted into GPS.
+Therefore every time a leap second is inserted into UTC,
+UTC falls another second behind GPS.
+Aside from the offset from \tcode{1958y/January/1} to \tcode{1980y/January/Sunday[1]},
+GPS is behind TAI by 19s due to the 10s offset between 1958 and 1970
+and the additional 9 leap seconds inserted between 1970 and 1980.
+
+\pnum
+\tcode{gps_clock} is not a TrivialClock
+unless the implementation can guarantee that
+\tcode{gps_clock::now()} does not propagate an exception.
+\begin{note}
+\tcode{noexcept(from_utc(utc_clock::now()))} is \tcode{false}.
+\end{note}
+
+\indexlibrarymember{now}{gps_clock}%
+\begin{itemdecl}
+static time_point now();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{from_utc(utc_clock::now())}, or a more accurate value of \tcode{gps_time}.
+\end{itemdescr}
+
+\indexlibrarymember{to_utc}{gps_clock}%
+\begin{itemdecl}
+template<class Duration>
+  static utc_time<common_type_t<Duration, seconds>>
+    to_utc(const gps_time<Duration>& t) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+gps_time<common_type_t<Duration, seconds>>{t.time_since_epoch()} + 315964809s
+\end{codeblock}
+\begin{note}
+\begin{codeblock}
+315964809s == sys_days{1980y/January/Sunday[1]} - sys_days{1970y/January/1} + 9s
+\end{codeblock}
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{from_utc}{gps_clock}%
+\begin{itemdecl}
+template<class Duration>
+  static gps_time<common_type_t<Duration, seconds>>
+    from_utc(const utc_time<Duration>& t) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+gps_time<common_type_t<Duration, seconds>>{t.time_since_epoch()} - 315964809s
+\end{codeblock}
+\begin{note}
+\begin{codeblock}
+315964809s == sys_days{1980y/January/Sunday[1]} - sys_days{1970y/January/1} + 9s
+\end{codeblock}
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{gps_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const gps_time<Duration>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects Calls \tcode{to_stream(os, fmt, t)},
+where \tcode{fmt} is a string containing
+\tcode{"\%F \%T"} widened to \tcode{charT}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{gps_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const gps_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects Streams \tcode{tp} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+If \tcode{\%Z} is used, it will be replaced with \tcode{"GPS"}.
+If \tcode{\%z} is used (or a modified variant of \tcode{\%z}),
+an offset of \tcode{0min} will be formatted.
+The date and time formatted
+shall be equivalent to that formatted by a \tcode{sys_time} initialized with:
+\begin{codeblock}
+sys_time<Duration>{tp.time_since_epoch()} +
+  (sys_days{1980y/January/Sunday[1]} - sys_days{1970y/January/1})
+\end{codeblock}
+
+\pnum
+\returns os.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+auto st = sys_days{2000y/January/1};
+auto gt = clock_cast<gps_clock>(st);
+cout << format("%F %T %Z == ", st) << format("%F %T %Z\n", gt);
+\end{codeblock}
+
+Produces this output:
+
+\begin{codeblock}
+2000-01-01 00:00:00 UTC == 2000-01-01 00:00:13 GPS
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{gps_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                gps_time<Duration>& tp, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Attempts to parse the input stream \tcode{is}
+into the \tcode{gps_time} \tcode{tp} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid date,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{tp} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+Additionally, the parsed offset will be subtracted from
+the successfully parsed timestamp prior to assigning that difference to \tcode{tp}.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.clock.file]{Class \tcode{file_clock}}
+\indexlibrary{\idxcode{file_clock}}%
+
+\begin{codeblock}
+namespace std::chrono {
+  class file_clock {
+  public:
+    using rep                       = @\textit{a signed arithmetic type}@;
+    using period                    = ratio<@\unspec@, @\unspec@>;
+    using duration                  = chrono::duration<rep, period>;
+    using time_point                = chrono::time_point<file_clock>;
+    static constexpr bool is_steady = @\unspec@;
+
+    static time_point now() noexcept;
+
+    // Conversion functions, see below
+  };
+}
+\end{codeblock}
+
+\pnum
+The clock \tcode{file_clock} is used to create the \tcode{time_point} system
+used for \tcode{file_time_type}\iref{filesystems}. Its epoch is unspecified.
+
+\indexlibrarymember{now}{file_clock}%
+\begin{itemdecl}
+static time_point now();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns A \tcode{file_clock::time_point} indicating the current time.
+\end{itemdescr}
+
+\pnum
+The class \tcode{file_clock} shall provide
+precisely one of the following two sets of static member functions:
+
+\begin{codeblock}
+template<class Duration>
+  static sys_time<@\seebelow@>
+    to_sys(const file_time<Duration>&);
+template<class Duration>
+  static file_time<@\seebelow@>
+    from_sys(const sys_time<Duration>&);
+\end{codeblock}
+
+or:
+
+\begin{codeblock}
+template<class Duration>
+  static utc_time<@\seebelow@>
+    to_utc(const file_time<Duration>&);
+template<class Duration>
+  static file_time<@\seebelow@>
+    from_utc(const utc_time<Duration>&);
+\end{codeblock}
+
+These member functions shall provide \tcode{time_point} conversions
+consistent with those specified by
+\tcode{utc_clock}, \tcode{tai_clock}, and \tcode{gps_clock}.
+The \tcode{Duration} of the resultant \tcode{time_point}
+is computed from the \tcode{Duration} of the input \tcode{time_point}.
+
+\indexlibrarymember{operator<<}{file_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const file_time<Duration>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects Calls \tcode{to_stream(os, fmt, t)},
+where \tcode{fmt} is a string containing
+\tcode{"\%F \%T"} widened to \tcode{charT}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{file_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const file_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams \tcode{tp} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+If \tcode{\%Z} is used, it will be replaced with \tcode{"UTC"} widened to \tcode{charT}.
+If \tcode{\%z} is used (or a modified variant of \tcode{\%z}),
+an offset of \tcode{0min} will be formatted.
+The date and time formatted shall be equivalent to
+that formatted by a \tcode{sys_time} initialized with
+\tcode{clock_cast<system_clock>(tp)},
+or by a \tcode{utc_time} initialized with
+\tcode{clock_cast<utc_clock>(tp)}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{file_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                file_time<Duration>& tp, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Attempts to parse the input stream \tcode{is}
+into the \tcode{file_time} \tcode{tp} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid date,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{tp} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+Additionally, the parsed offset will be subtracted from
+the successfully parsed timestamp prior to assigning that difference to \tcode{tp}.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
 \rSec3[time.clock.steady]{Class \tcode{steady_clock}}
 \indexlibrary{\idxcode{steady_clock}}%
 
@@ -20012,6 +20903,428 @@ namespace std::chrono {
   };
 }
 \end{codeblock}
+
+\rSec3[time.clock.local]{Local time}
+\indexlibrary{\idxcode{local_time}}%
+
+\pnum
+The family of time points
+denoted by \tcode{local_time<Duration>}
+are based on the pseudo clock \tcode{local_t}.
+\tcode{local_t} has no member \tcode{now()}
+and thus does not meet the clock requirements.
+Nevertheless \tcode{local_time<Duration>} serves the vital role of
+representing local time with respect to a not-yet-specified time zone.
+Aside from being able to get the current time,
+the complete \tcode{time_point} algebra is available
+for \tcode{local_time<Duration>} (just as for \tcode{sys_time<Duration>}).
+
+\indexlibrarymember{operator<<}{local_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const local_time<Duration>& lt);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+\begin{codeblock}
+os << sys_time<Duration>{lt.time_since_epoch()};
+\end{codeblock}
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{local_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const local_time<Duration>& tp,
+              const string* abbrev = nullptr, const seconds* offset_sec = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams \tcode{tp} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+If \tcode{\%Z} is used,
+it will be replaced with \tcode{*abbrev} if \tcode{abbrev} is not equal to \tcode{nullptr}.
+If \tcode{abbrev} is equal to \tcode{nullptr} (and \tcode{\%Z} is used),
+\tcode{os.setstate(ios_base::failbit)} shall be called.
+If \tcode{\%z} is used (or a modified variant of \tcode{\%z}),
+it will be formatted with the value of \tcode{*offset_sec}
+if \tcode{offset_sec} is not equal to \tcode{nullptr}.
+If \tcode{\%z} (or a modified variant of \tcode{\%z}) is used,
+and \tcode{offset_sec} is equal to \tcode{nullptr}, then
+\tcode{os.setstate(ios_base::failbit)} shall be called.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{local_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                local_time<Duration>& tp, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Attempts to parse the input stream \tcode{is}
+into the \tcode{local_time} \tcode{tp} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid date,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{tp} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.clock.cast]{\tcode{time_point} conversions}
+\indexlibrary{\idxcode{clock_time_conversion}}%
+
+\begin{codeblock}
+namespace std::chrono {
+  template<class DestClock, class SourceClock>
+  struct clock_time_conversion {};
+}
+\end{codeblock}
+
+\pnum
+\tcode{clock_time_conversion} serves as a trait
+which can be used to specify how to convert
+a source \tcode{time_point} of type
+\tcode{time_point<SourceClock, Duration>}
+to a destination \tcode{time_point} of type
+\tcode{time_point<DestClock, Duration>}
+via a specialization:
+\tcode{clock_time_conversion<DestClock, SourceClock>}.
+A specialization of \tcode{clock_time_conversion<DestClock, SourceClock>}
+shall provide a const-qualified \tcode{operator()}
+that takes a parameter of type \tcode{time_point<SourceClock, Duration>}
+and returns a \tcode{time_point<DestClock, OtherDuration>}
+representing an equivalent point in time.
+\tcode{OtherDuration} is a \tcode{chrono::duration}
+whose specialization is computed from the input \tcode{Duration}
+in a manner which can vary for each \tcode{clock_time_conversion} specialization.
+A program may specialize \tcode{clock_time_conversion}
+if at least one of the template parameters is a user-defined clock type.
+
+\pnum
+Several specializations are provided by the implementation,
+as described in
+\ref{time.clock.cast.id},
+\ref{time.clock.cast.sys.utc},
+\ref{time.clock.cast.sys}, and
+\ref{time.clock.cast.utc}.
+
+\rSec4[time.clock.cast.id]{Identity conversions}
+
+\begin{codeblock}
+template<typename Clock>
+struct clock_time_conversion<Clock, Clock> {
+  template<class Duration>
+    time_point<Clock, Duration>
+      operator()(const time_point<Clock, Duration>& t) const;
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  time_point<Clock, Duration>
+    operator()(const time_point<Clock, Duration>& t) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{t}.
+\end{itemdescr}
+
+\begin{codeblock}
+template<>
+struct clock_time_conversion<system_clock, system_clock> {
+  template<class Duration>
+    sys_time<Duration>
+      operator()(const sys_time<Duration>& t) const;
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  sys_time<Duration>
+    operator()(const sys_time<Duration>& t) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{t}.
+\end{itemdescr}
+
+\begin{codeblock}
+template<>
+struct clock_time_conversion<utc_clock, utc_clock> {
+  template<class Duration>
+    utc_time<Duration>
+      operator()(const utc_time<Duration>& t) const;
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  utc_time<Duration>
+    operator()(const utc_time<Duration>& t) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{t}.
+\end{itemdescr}
+
+\rSec4[time.clock.cast.sys.utc]{Conversions between \tcode{system_clock} and \tcode{utc_clock}}
+
+\begin{codeblock}
+template<>
+struct clock_time_conversion<utc_clock, system_clock> {
+  template<class Duration>
+    utc_time<common_type_t<Duration, seconds>>
+      operator()(const sys_time<Duration>& t) const;
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  utc_time<common_type_t<Duration, seconds>>
+    operator()(const sys_time<Duration>& t) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{utc_clock::from_sys(t)}.
+\end{itemdescr}
+
+\begin{codeblock}
+template<>
+struct clock_time_conversion<system_clock, utc_clock> {
+  template<class Duration>
+    sys_time<common_type_t<Duration, seconds>>
+      operator()(const utc_time<Duration>& t) const;
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  sys_time<common_type_t<Duration, seconds>>
+    operator()(const utc_time<Duration>& t) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{utc_clock::to_sys(t)}.
+\end{itemdescr}
+
+\rSec4[time.clock.cast.sys]{Conversions between \tcode{system_clock} and other clocks}
+
+\begin{codeblock}
+template<class SourceClock>
+struct clock_time_conversion<system_clock, SourceClock> {
+  template<class Duration>
+    auto operator()(const time_point<SourceClock, Duration>& t) const
+      -> decltype(SourceClock::to_sys(t));
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  auto operator()(const time_point<SourceClock, Duration>& t) const
+    -> decltype(SourceClock::to_sys(t));
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function does not participate in overload resolution unless
+\tcode{SourceClock::to_sys(t)} is well-formed.
+If \tcode{SourceClock::to_sys(t)}
+does not return \tcode{sys_time<Duration>},
+where \tcode{Duration} is a valid \tcode{chrono::duration} specialization,
+the program is ill-formed.
+
+\pnum
+\returns \tcode{SourceClock::to_sys(t)}.
+\end{itemdescr}
+
+\begin{codeblock}
+template<class DestClock>
+struct clock_time_conversion<DestClock, system_clock> {
+  template<class Duration>
+    auto operator()(const sys_time<Duration>& t) const
+      -> decltype(DestClock::from_sys(t));
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  auto operator()(const sys_time<Duration>& t) const
+    -> decltype(DestClock::from_sys(t));
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function does not participate in overload resolution unless
+\tcode{DestClock::from_sys(t)} is well-formed.
+If \tcode{DestClock::from_sys(t)} does not return
+\tcode{time_point<DestClock, Duration>},
+where \tcode{Duration} is a valid \tcode{chrono::duration} specialization,
+the program is ill-formed.
+
+\pnum
+\returns \tcode{DestClock::from_sys(t)}.
+\end{itemdescr}
+
+\rSec4[time.clock.cast.utc]{Conversions between \tcode{utc_clock} and other clocks}
+
+\begin{codeblock}
+template<class SourceClock>
+struct clock_time_conversion<utc_clock, SourceClock> {
+  template<class Duration>
+    auto operator()(const time_point<SourceClock, Duration>& t) const
+      -> decltype(SourceClock::to_utc(t));
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  auto operator()(const time_point<SourceClock, Duration>& t) const
+    -> decltype(SourceClock::to_utc(t));
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function does not participate in overload resolution unless
+\tcode{SourceClock::to_utc(t)} is well-formed.
+If \tcode{SourceClock::to_utc(t)} does not return
+\tcode{utc_time<Duration>},
+where \tcode{Duration} is a valid \tcode{chrono::duration} specialization,
+the program is ill-formed.
+
+\pnum
+\returns \tcode{SourceClock::to_utc(t)}.
+\end{itemdescr}
+
+\begin{codeblock}
+template<class DestClock>
+struct clock_time_conversion<DestClock, utc_clock> {
+  template<class Duration>
+    auto operator()(const utc_time<Duration>& t) const
+      -> decltype(DestClock::from_utc(t));
+};
+\end{codeblock}
+
+\indexlibrarymember{operator()}{clock_time_conversion}%
+\begin{itemdecl}
+template<class Duration>
+  auto operator()(const utc_time<Duration>& t) const
+    -> decltype(DestClock::from_utc(t));
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function does not participate in overload resolution unless
+\tcode{DestClock::from_utc(t)} is well-formed.
+If \tcode{DestClock::from_utc(t)} does not return
+\tcode{time_point<DestClock, Duration>},
+where \tcode{Duration} is a valid \tcode{chrono::duration} specialization,
+the program is ill-formed.
+
+\pnum
+\returns \tcode{DestClock::from_utc(t)}.
+\end{itemdescr}
+
+\rSec4[time.clock.cast.fn]{Function template \tcode{clock_cast}}
+
+\indexlibrary{\idxcode{clock_cast}}%
+\begin{itemdecl}
+template<class DestClock, class SourceClock, class Duration>
+  auto clock_cast(const time_point<SourceClock, Duration>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This function does not participate in overload resolution unless
+at least one of the following clock time conversion expressions
+is well-formed:
+
+\begin{itemize}
+\item
+\begin{codeblock}
+clock_time_conversion<DestClock, SourceClock>{}(t)
+\end{codeblock}
+
+\item
+\begin{codeblock}
+clock_time_conversion<DestClock, system_clock>{}(
+    clock_time_conversion<system_clock, SourceClock>{}(t))
+\end{codeblock}
+
+\item
+\begin{codeblock}
+clock_time_conversion<DestClock, utc_clock>{}(
+    clock_time_conversion<utc_clock, SourceClock>{}(t))
+\end{codeblock}
+
+\item
+\begin{codeblock}
+clock_time_conversion<DestClock, utc_clock>{}(
+    clock_time_conversion<utc_clock, system_clock>{}(
+        clock_time_conversion<system_clock, SourceClock>{}(t)))
+\end{codeblock}
+
+\item
+\begin{codeblock}
+clock_time_conversion<DestClock, system_clock>{}(
+    clock_time_conversion<system_clock, utc_clock>{}(
+        clock_time_conversion<utc_clock, SourceClock>{}(t)))
+\end{codeblock}
+\end{itemize}
+
+A clock time conversion expression is considered better than
+another clock time conversion expression if it involves fewer
+\tcode{operator()} calls on \tcode{clock_time_conversion}
+specializations.
+If, among the well-formed clock time conversion expressions
+from the above list, there is not a unique best expression,
+the \tcode{clock_cast} is ambiguous and the program is ill-formed.
+
+\pnum
+\returns
+The best well-formed clock time conversion expression in the above list.
+\end{itemdescr}
 
 \rSec2[ctime.syn]{Header \tcode{<ctime>} synopsis}
 
