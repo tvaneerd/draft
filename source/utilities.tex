@@ -19977,6 +19977,8 @@ requirements\iref{time.clock.req}
 unless otherwise specified.
 
 \rSec3[time.clock.system]{Class \tcode{system_clock}}
+
+\rSec4[time.clock.system.overview]{Overview}
 \indexlibrary{\idxcode{system_clock}}%
 
 \begin{codeblock}
@@ -20011,6 +20013,8 @@ This measure facilitates an efficient mapping between
 \tcode{sys_seconds\{sys_days\{2000y/January/1\}\}.time_since_epoch()} is \tcode{946'684'800s},
 which is \tcode{10'957 * 86'400s}. \\
 \end{example}
+
+\rSec4[time.clock.system.members]{Members}
 
 \indexlibrarymember{rep}{system_clock}%
 \begin{itemdecl}
@@ -20053,6 +20057,8 @@ It is \impldef{whether values are rounded or truncated to the
 required precision when converting between \tcode{time_t} values and \tcode{time_point} objects}
 whether values are rounded or truncated to the required precision.
 \end{itemdescr}
+
+\rSec4[time.clock.system.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator<<}{sys_time}%
 \begin{itemdecl}
@@ -20156,6 +20162,8 @@ prior to assigning that difference to \tcode{tp}.
 \end{itemdescr}
 
 \rSec3[time.clock.utc]{Class \tcode{utc_clock}}
+
+\rSec4[time.clock.utc.overview]{Overview}
 \indexlibrary{\idxcode{utc_clock}}%
 
 \begin{codeblock}
@@ -20196,6 +20204,8 @@ is \tcode{946'684'822s}, which is \tcode{10'957 * 86'400s + 22s}. \\
 unless the implementation can guarantee that \tcode{utc_clock::now()}
 does not propagate an exception.
 \begin{note} \tcode{noexcept(from_sys(system_clock::now()))} is \tcode{false}. \end{note}
+
+\rSec4[time.clock.utc.members]{Member functions}
 
 \indexlibrarymember{now}{utc_clock}%
 \begin{itemdecl}
@@ -20259,6 +20269,8 @@ assert(u.time_since_epoch() - t.time_since_epoch() == 26s);
 \end{codeblock}
 \end{example}
 \end{itemdescr}
+
+\rSec4[time.clock.utc.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator<<}{utc_time}%
 \begin{itemdecl}
@@ -20357,6 +20369,8 @@ prior to assigning that difference to \tcode{tp}.
 \end{itemdescr}
 
 \rSec3[time.clock.tai]{Class \tcode{tai_clock}}
+
+\rSec4[time.clock.tai.overview]{Overview}
 \indexlibrary{\idxcode{tai_clock}}%
 
 \begin{codeblock}
@@ -20399,6 +20413,8 @@ does not propagate an exception.
 \begin{note}
 \tcode{noexcept(from_utc(utc_clock::now()))} is \tcode{false}.
 \end{note}
+
+\rSec4[time.clock.tai.members]{Member functions}
 
 \indexlibrarymember{now}{tai_clock}%
 \begin{itemdecl}
@@ -20449,6 +20465,8 @@ tai_time<common_type_t<Duration, seconds>>{t.time_since_epoch()} + 378691210s
 \end{codeblock}
 \end{note}
 \end{itemdescr}
+
+\rSec4[time.clock.tai.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator<<}{tai_time}%
 \begin{itemdecl}
@@ -20541,6 +20559,8 @@ the successfully parsed timestamp prior to assigning that difference to \tcode{t
 \end{itemdescr}
 
 \rSec3[time.clock.gps]{Class \tcode{gps_clock}}
+
+\rSec4[time.clock.gps.overview]{Overview}
 \indexlibrary{\idxcode{gps_clock}}%
 
 \begin{codeblock}
@@ -20582,6 +20602,8 @@ unless the implementation can guarantee that
 \begin{note}
 \tcode{noexcept(from_utc(utc_clock::now()))} is \tcode{false}.
 \end{note}
+
+\rSec4[time.clock.gps.members]{Member functions}
 
 \indexlibrarymember{now}{gps_clock}%
 \begin{itemdecl}
@@ -20632,6 +20654,8 @@ gps_time<common_type_t<Duration, seconds>>{t.time_since_epoch()} - 315964809s
 \end{codeblock}
 \end{note}
 \end{itemdescr}
+
+\rSec4[time.clock.gps.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator<<}{gps_time}%
 \begin{itemdecl}
@@ -20722,6 +20746,8 @@ the successfully parsed timestamp prior to assigning that difference to \tcode{t
 \end{itemdescr}
 
 \rSec3[time.clock.file]{Class \tcode{file_clock}}
+
+\rSec4[time.clock.file.overview]{Overview}
 \indexlibrary{\idxcode{file_clock}}%
 
 \begin{codeblock}
@@ -20744,6 +20770,8 @@ namespace std::chrono {
 \pnum
 The clock \tcode{file_clock} is used to create the \tcode{time_point} system
 used for \tcode{file_time_type}\iref{filesystems}. Its epoch is unspecified.
+
+\rSec4[time.clock.file.members]{Member functions}
 
 \indexlibrarymember{now}{file_clock}%
 \begin{itemdecl}
@@ -20784,6 +20812,8 @@ consistent with those specified by
 \tcode{utc_clock}, \tcode{tai_clock}, and \tcode{gps_clock}.
 The \tcode{Duration} of the resultant \tcode{time_point}
 is computed from the \tcode{Duration} of the input \tcode{time_point}.
+
+\rSec4[time.clock.file.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator<<}{file_time}%
 \begin{itemdecl}
@@ -20995,6 +21025,8 @@ that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 \end{itemdescr}
 
 \rSec3[time.clock.cast]{\tcode{time_point} conversions}
+
+\rSec4[time.clock.conv]{Class template \tcode{clock_time_conversion}}
 \indexlibrary{\idxcode{clock_time_conversion}}%
 
 \begin{codeblock}
@@ -21328,8 +21360,10 @@ The best well-formed clock time conversion expression in the above list.
 
 \rSec2[time.calendar]{The civil calendar}
 
+\rSec3[time.calendar.general]{In general}
+
 \pnum
-The types in this subclause describe the civil (Gregorian) calendar
+The types in \ref{time.calendar} describe the civil (Gregorian) calendar
 and its relationship to \tcode{sys_days} and \tcode{local_days}.
 
 \rSec3[time.calendar.last]{Class \tcode{last_spec}}
@@ -21352,6 +21386,8 @@ it can represent the last day of a month,
 or the last day of the week of a month.
 
 \rSec3[time.calendar.day]{Class \tcode{day}}
+
+\rSec4[time.calendar.day.overview]{Overview}
 \indexlibrary{\idxcode{day}}
 
 \begin{codeblock}
@@ -21389,6 +21425,8 @@ which represent a difference between two \tcode{day} objects.
 
 \pnum
 \tcode{day} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.day.members]{Member functions}
 
 \indexlibrary{\idxcode{day}!constructor}%
 \begin{itemdecl}
@@ -21500,6 +21538,8 @@ constexpr bool ok() const noexcept;
 \pnum
 \returns \tcode{1 <= d_ \&\& d_ <= 31}.
 \end{itemdescr}
+
+\rSec4[time.calendar.day.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator==}{day}%
 \begin{itemdecl}
@@ -21636,6 +21676,8 @@ constexpr day operator""d(unsigned long long d) noexcept;
 \end{itemdescr}
 
 \rSec3[time.calendar.month]{Class \tcode{month}}
+
+\rSec4[time.calendar.month.overview]{Overview}
 \indexlibrary{\idxcode{month}}
 
 \begin{codeblock}
@@ -21673,6 +21715,8 @@ which represent a difference between two \tcode{month} objects.
 
 \pnum
 \tcode{month} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.month.members]{Member functions}
 
 \indexlibrary{\idxcode{month}!constructor}%
 \begin{itemdecl}
@@ -21784,6 +21828,8 @@ constexpr bool month::ok() const noexcept;
 \pnum
 \returns \tcode{1 <= m_ \&\& m_ <= 12}.
 \end{itemdescr}
+
+\rSec4[time.calendar.month.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator==}{month}%
 \begin{itemdecl}
@@ -21933,6 +21979,8 @@ that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 \end{itemdescr}
 
 \rSec3[time.calendar.year]{Class \tcode{year}}
+
+\rSec4[time.calendar.year.overview]{Overview}
 \indexlibrary{\idxcode{year}}
 
 \begin{codeblock}
@@ -21977,6 +22025,8 @@ which represent a difference between two \tcode{year} objects.
 
 \pnum
 \tcode{year} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.year.members]{Member functions}
 
 \indexlibrary{\idxcode{year}!constructor}%
 \begin{itemdecl}
@@ -22139,6 +22189,8 @@ static constexpr year max() noexcept;
 \returns \tcode{year\{32767\}}.
 \end{itemdescr}
 
+\rSec4[time.calendar.year.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{year}%
 \begin{itemdecl}
 constexpr bool operator==(const year& x, const year& y) noexcept;
@@ -22274,6 +22326,8 @@ constexpr year operator""y(unsigned long long y) noexcept;
 \end{itemdescr}
 
 \rSec3[time.calendar.weekday]{Class \tcode{weekday}}
+
+\rSec4[time.calendar.weekday.overview]{Overview}
 \indexlibrary{\idxcode{weekday}}
 
 \begin{codeblock}
@@ -22321,6 +22375,8 @@ with no beginning and no end.
 
 \pnum
 \tcode{weekday} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.weekday.members]{Member functions}
 
 \indexlibrary{\idxcode{weekday}!constructor}%
 \begin{itemdecl}
@@ -22473,7 +22529,7 @@ constexpr bool ok() const noexcept;
 
 \indexlibrarymember{operator[]}{weekday}%
 \begin{itemdecl}
-constexpr weekday_indexed weekday::operator[](unsigned index) const noexcept;
+constexpr weekday_indexed operator[](unsigned index) const noexcept;
 \end{itemdecl}
 
 \begin{itemdescr}
@@ -22483,13 +22539,15 @@ constexpr weekday_indexed weekday::operator[](unsigned index) const noexcept;
 
 \indexlibrarymember{operator[]}{weekday}%
 \begin{itemdecl}
-constexpr weekday_last weekday::operator[](last_spec) const noexcept;
+constexpr weekday_last operator[](last_spec) const noexcept;
 \end{itemdecl}
 
 \begin{itemdescr}
 \pnum
 \returns \tcode{weekday_last\{*this\}}.
 \end{itemdescr}
+
+\rSec4[time.calendar.weekday.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator==}{weekday}%
 \begin{itemdecl}
@@ -22629,6 +22687,8 @@ that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 \end{itemdescr}
 
 \rSec3[time.calendar.weekday.indexed]{Class \tcode{weekday_indexed}}
+
+\rSec4[time.calendar.weekday.indexed.overview]{Overview}
 \indexlibrary{\idxcode{weekday_indexed}}
 
 \begin{codeblock}
@@ -22670,6 +22730,8 @@ static_assert(wdi.index() == 2);
 
 \pnum
 \tcode{weekday_indexed} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.weekday.indexed.members]{Member functions}
 
 \indexlibrary{\idxcode{weekday_indexed}!constructor}%
 \begin{itemdecl}
@@ -22714,6 +22776,8 @@ constexpr bool ok() const noexcept;
 \returns \tcode{wd_.ok() \&\& 1 <= index_ \&\& index_ <= 5}.
 \end{itemdescr}
 
+\rSec4[time.calendar.weekday.indexed.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{weekday_indexed}%
 \begin{itemdecl}
 constexpr bool operator==(const weekday_indexed& x, const weekday_indexed& y) noexcept;
@@ -22745,6 +22809,8 @@ appends with \tcode{" is not a valid index]"}.
 \end{itemdescr}
 
 \rSec3[time.calendar.weekday.last]{Class \tcode{weekday_last}}
+
+\rSec4[time.calendar.weekday.last.overview]{Overview}
 \indexlibrary{\idxcode{weekday_last}}
 
 \begin{codeblock}
@@ -22779,6 +22845,8 @@ static_assert(wdl.weekday() == Sunday);
 \pnum
 \tcode{weekday_last} is a trivially copyable and standard-layout class type.
 
+\rSec4[time.calendar.weekday.last.members]{Member functions}
+
 \indexlibrary{\idxcode{weekday_last}!constructor}%
 \begin{itemdecl}
 explicit constexpr weekday_last(const chrono::weekday& wd) noexcept;
@@ -22811,6 +22879,8 @@ constexpr bool ok() const noexcept;
 \returns \tcode{wd_.ok()}.
 \end{itemdescr}
 
+\rSec4[time.calendar.weekday.last.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{weekday_last}%
 \begin{itemdecl}
 constexpr bool operator==(const weekday_last& x, const weekday_last& y) noexcept;
@@ -22834,6 +22904,8 @@ template<class charT, class traits>
 \end{itemdescr}
 
 \rSec3[time.calendar.month.day]{Class \tcode{month_day}}
+
+\rSec4[time.calendar.month.day.overview]{Overview}
 \indexlibrary{\idxcode{month_day}}
 
 \begin{codeblock}
@@ -22861,6 +22933,8 @@ and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}).
 
 \pnum
 \tcode{month_day} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.month.day.members]{Member functions}
 
 \indexlibrary{\idxcode{month_day}!constructor}%
 \begin{itemdecl}
@@ -22910,6 +22984,8 @@ otherwise returns \tcode{false}.
 When \tcode{m_ == February},
 the number of days is considered to be 29.
 \end{itemdescr}
+
+\rSec4[time.calendar.month.day.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator==}{month_day}%
 \begin{itemdecl}
@@ -23093,6 +23169,8 @@ template<class charT, class traits>
 \end{itemdescr}
 
 \rSec3[time.calendar.month.weekday]{Class \tcode{month_weekday}}
+
+\rSec4[time.calendar.month.weekday.overview]{Overview}
 \indexlibrary{\idxcode{month_weekday}}
 
 \begin{codeblock}
@@ -23127,6 +23205,8 @@ static_assert(mwd.weekday_indexed() == Tueday[3]);
 
 \pnum
 \tcode{month_weekday} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.month.weekday.members]{Member functions}
 
 \indexlibrary{\idxcode{month_weekday}!constructor}%
 \begin{itemdecl}
@@ -23170,6 +23250,8 @@ constexpr bool ok() const noexcept;
 \returns \tcode{m_.ok() \&\& wdi_.ok()}.
 \end{itemdescr}
 
+\rSec4[time.calendar.month.weekday.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{month_weekday}%
 \begin{itemdecl}
 constexpr bool operator==(const month_weekday& x, const month_weekday& y) noexcept;
@@ -23193,6 +23275,8 @@ template<class charT, class traits>
 \end{itemdescr}
 
 \rSec3[time.calendar.month.weekday.last]{Class \tcode{month_weekday_last}}
+
+\rSec4[time.calendar.month.weekday.last.overview]{Overview}
 \indexlibrary{\idxcode{month_weekday_last}}
 
 \begin{codeblock}
@@ -23228,6 +23312,8 @@ static_assert(mwd.weekday_last() == Tueday[last]);
 
 \pnum
 \tcode{month_weekday_last} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.month.weekday.last.members]{Member functions}
 
 \indexlibrary{\idxcode{month_weekday_last}!constructor}%
 \begin{itemdecl}
@@ -23272,6 +23358,8 @@ constexpr bool ok() const noexcept;
 \returns \tcode{m_.ok() \&\& wdl_.ok()}.
 \end{itemdescr}
 
+\rSec4[time.calendar.month.weekday.last.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{month_weekday_last}%
 \begin{itemdecl}
 constexpr bool operator==(const month_weekday_last& x, const month_weekday_last& y) noexcept;
@@ -23295,6 +23383,8 @@ template<class charT, class traits>
 \end{itemdescr}
 
 \rSec3[time.calendar.year.month]{Class \tcode{year_month}}
+
+\rSec4[time.calendar.year.month.overview]{Overview}
 \indexlibrary{\idxcode{year_month}}
 
 \begin{codeblock}
@@ -23329,6 +23419,8 @@ and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}).
 
 \pnum
 \tcode{year_month} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.year.month.members]{Member functions}
 
 \indexlibrary{\idxcode{year_month}!constructor}%
 \begin{itemdecl}
@@ -23423,6 +23515,8 @@ constexpr bool ok() const noexcept;
 \pnum
 \returns \tcode{y_.ok() \&\& m_.ok()}.
 \end{itemdescr}
+
+\rSec4[time.calendar.year.month.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator==}{year_month}%
 \begin{itemdecl}
@@ -23583,6 +23677,8 @@ that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 \end{itemdescr}
 
 \rSec3[time.calendar.year.month.day]{Class \tcode{year_month_day}}
+
+\rSec4[time.calendar.year.month.day.overview]{Overview}
 \indexlibrary{\idxcode{year_month_day}}
 
 \begin{codeblock}
@@ -23630,6 +23726,8 @@ and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
 
 \pnum
 \tcode{year_month_day} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.year.month.day.members]{Member functions}
 
 \indexlibrary{\idxcode{year_month_day}!constructor}%
 \begin{itemdecl}
@@ -23842,6 +23940,8 @@ and \tcode{d_} is in the range \crange{1d}{(y_/m_/last).day()},
 then returns \tcode{true}; otherwise returns \tcode{false}.
 \end{itemdescr}
 
+\rSec4[time.calendar.year.month.day.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{year_month_day}%
 \begin{itemdecl}
 constexpr bool operator==(const year_month_day& x, const year_month_day& y) noexcept;
@@ -24007,20 +24107,9 @@ that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 \end{itemdescr}
 
 \rSec3[time.calendar.year.month.day.last]{Class \tcode{year_month_day_last}}
-\indexlibrary{\idxcode{year_month_day_last}}
 
-\pnum
-\tcode{year_month_day_last} represents the last day of a specific year and month.
-\tcode{year_month_day_last} is a field-based time point with a resolution of \tcode{days},
-except that it is restricted to pointing to the last day of a year and month.
-\begin{note}
-\tcode{year_month_day_last} supports \tcode{years}- and \tcode{months}-oriented arithmetic,
-but not \tcode{days}-oriented arithmetic.
-For the latter, there is a conversion to \tcode{sys_days},
-which efficiently supports \tcode{days}-oriented arithmetic.
-\end{note}
-\tcode{year_month_day_last} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
-and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
+\rSec4[time.calendar.year.month.day.last.overview]{Overview}
+\indexlibrary{\idxcode{year_month_day_last}}
 
 \begin{codeblock}
 namespace std::chrono {
@@ -24050,7 +24139,22 @@ namespace std::chrono {
 \end{codeblock}
 
 \pnum
+\tcode{year_month_day_last} represents the last day of a specific year and month.
+\tcode{year_month_day_last} is a field-based time point with a resolution of \tcode{days},
+except that it is restricted to pointing to the last day of a year and month.
+\begin{note}
+\tcode{year_month_day_last} supports \tcode{years}- and \tcode{months}-oriented arithmetic,
+but not \tcode{days}-oriented arithmetic.
+For the latter, there is a conversion to \tcode{sys_days},
+which efficiently supports \tcode{days}-oriented arithmetic.
+\end{note}
+\tcode{year_month_day_last} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
+
+\pnum
 \tcode{year_month_day_last} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.year.month.day.last.members]{Member functions}
 
 \indexlibrary{\idxcode{year_month_day_last}!constructor}%
 \begin{itemdecl}
@@ -24194,6 +24298,8 @@ constexpr bool ok() const noexcept;
 \returns \tcode{y_.ok() \&\& mdl_.ok()}.
 \end{itemdescr}
 
+\rSec4[time.calendar.year.month.day.last.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{year_month_day_last}%
 \begin{itemdecl}
 constexpr bool operator==(const year_month_day_last& x, const year_month_day_last& y) noexcept;
@@ -24296,6 +24402,8 @@ template<class charT, class traits>
 \end{itemdescr}
 
 \rSec3[time.calendar.year.month.weekday]{Class \tcode{year_month_weekday}}
+
+\rSec4[time.calendar.year.month.weekday.overview]{Overview}
 \indexlibrary{\idxcode{year_month_weekday}}
 
 \begin{codeblock}
@@ -24344,6 +24452,8 @@ which efficiently supports \tcode{days}-oriented arithmetic.
 
 \pnum
 \tcode{year_month_weekday} is a trivially copyable and standard-layout class type.
+
+\rSec4[time.calendar.year.month.weekday.members]{Member functions}
 
 \indexlibrary{\idxcode{year_month_weekday}!constructor}%
 \begin{itemdecl}
@@ -24541,6 +24651,8 @@ returns \tcode{true}.
 Otherwise, returns \tcode{false}.
 \end{itemdescr}
 
+\rSec4[time.calendar.year.month.weekday.nonmembers]{Non-member functions}
+
 \indexlibrarymember{operator==}{year_month_weekday}%
 \begin{itemdecl}
 constexpr bool operator==(const year_month_weekday& x, const year_month_weekday& y) noexcept;
@@ -24627,6 +24739,8 @@ template<class charT, class traits>
 \end{itemdescr}
 
 \rSec3[time.calendar.year.month.weekday.last]{Class \tcode{year_month_weekday_last}}
+
+\rSec4[time.calendar.year.month.weekday.last.overview]{Overview}
 \indexlibrary{\idxcode{year_month_weekday_last}}
 
 \begin{codeblock}
@@ -24669,6 +24783,8 @@ For the latter, there is a conversion to \tcode{sys_days},
 which efficiently supports \tcode{days}-oriented arithmetic.
 \end{note}
 \tcode{year_month_weekday_last} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable}).
+
+\rSec4[time.calendar.year.month.weekday.last.members]{Member functions}
 
 \pnum
 \tcode{year_month_weekday_last} is a trivially copyable and standard-layout class type.
@@ -24811,6 +24927,8 @@ constexpr bool ok() const noexcept;
 \pnum
 \returns \tcode{y_.ok() \&\& m_.ok() \&\& wdl_.ok()}.
 \end{itemdescr}
+
+\rSec4[time.calendar.year.month.weekday.last.nonmembers]{Non-member functions}
 
 \indexlibrarymember{operator==}{year_month_weekday_last}%
 \begin{itemdecl}
