@@ -18218,7 +18218,7 @@ namespace std {
     constexpr year_month_weekday_last
       operator/(const month_weekday_last& mwdl, int y) noexcept;
 
-    // \ref{time.tod}, time_of_day
+    // \ref{time.tod}, class template \tcode{time_of_day}
     template<class Duration> class time_of_day;
     template<> class time_of_day<hours>;
     template<> class time_of_day<minutes>;
@@ -19536,8 +19536,8 @@ template<class charT, class traits, class Rep, class Period>
 \begin{itemdescr}
 \pnum
 \effects
-Streams \tcode{d} into \tcode{os}
-using the format specified by the NTCTS \tcode{fmt}.
+Streams \tcode{d} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
 \tcode{fmt} encoding follows the rules specified in \ref{time.format}.
 
 \pnum
@@ -19979,20 +19979,6 @@ unless otherwise specified.
 \rSec3[time.clock.system]{Class \tcode{system_clock}}
 \indexlibrary{\idxcode{system_clock}}%
 
-\pnum
-Objects of type \tcode{system_clock} represent wall clock time from the system-wide
-realtime clock.
-Objects of type \tcode{sys_time<Duration>} measure time since (and before)
-1970-01-01 00:00:00 UTC excluding leap seconds.
-This measure is commonly referred to as \defn{Unix time}.
-This measure facilitates an efficient mapping between
-\tcode{sys_time} and calendar types\iref{time.calendar}.
-\begin{example} \\
-\tcode{sys_seconds\{sys_days\{1970y/January/1\}\}.time_since_epoch()} is \tcode{0s}. \\
-\tcode{sys_seconds\{sys_days\{2000y/January/1\}\}.time_since_epoch()} is \tcode{946'684'800s},
-which is \tcode{10'957 * 86'400s}. \\
-\end{example}
-
 \begin{codeblock}
 namespace std::chrono {
   class system_clock {
@@ -20011,6 +19997,20 @@ namespace std::chrono {
   };
 }
 \end{codeblock}
+
+\pnum
+Objects of type \tcode{system_clock} represent wall clock time from the system-wide
+realtime clock.
+Objects of type \tcode{sys_time<Duration>} measure time since (and before)
+1970-01-01 00:00:00 UTC excluding leap seconds.
+This measure is commonly referred to as \defn{Unix time}.
+This measure facilitates an efficient mapping between
+\tcode{sys_time} and calendar types\iref{time.calendar}.
+\begin{example} \\
+\tcode{sys_seconds\{sys_days\{1970y/January/1\}\}.time_since_epoch()} is \tcode{0s}. \\
+\tcode{sys_seconds\{sys_days\{2000y/January/1\}\}.time_since_epoch()} is \tcode{946'684'800s},
+which is \tcode{10'957 * 86'400s}. \\
+\end{example}
 
 \indexlibrarymember{rep}{system_clock}%
 \begin{itemdecl}
@@ -20163,7 +20163,7 @@ namespace std::chrono {
   class utc_clock {
   public:
     using rep                       = @\textit{a signed arithmetic type}@;
-    using period                    = ratio<@\unspec@, @\unspec@>;
+    using period                    = ratio<@\unspecnc@, @\unspec@>;
     using duration                  = chrono::duration<rep, period>;
     using time_point                = chrono::time_point<utc_clock>;
     static constexpr bool is_steady = @\unspec@;
@@ -20364,7 +20364,7 @@ namespace std::chrono {
   class tai_clock {
   public:
     using rep                       = @\textit{a signed arithmetic type}@;
-    using period                    = ratio<@\unspec@, @\unspec@>;
+    using period                    = ratio<@\unspecnc@, @\unspec@>;
     using duration                  = chrono::duration<rep, period>;
     using time_point                = chrono::time_point<tai_clock>;
     static constexpr bool is_steady = @\unspec@;
@@ -20548,7 +20548,7 @@ namespace std::chrono {
   class gps_clock {
   public:
     using rep                       = @\textit{a signed arithmetic type}@;
-    using period                    = ratio<@\unspec@, @\unspec@>;
+    using period                    = ratio<@\unspecnc@, @\unspec@>;
     using duration                  = chrono::duration<rep, period>;
     using time_point                = chrono::time_point<gps_clock>;
     static constexpr bool is_steady = @\unspec@;
@@ -20729,7 +20729,7 @@ namespace std::chrono {
   class file_clock {
   public:
     using rep                       = @\textit{a signed arithmetic type}@;
-    using period                    = ratio<@\unspec@, @\unspec@>;
+    using period                    = ratio<@\unspecnc@, @\unspec@>;
     using duration                  = chrono::duration<rep, period>;
     using time_point                = chrono::time_point<file_clock>;
     static constexpr bool is_steady = @\unspec@;
@@ -20861,11 +20861,6 @@ the successfully parsed timestamp prior to assigning that difference to \tcode{t
 \rSec3[time.clock.steady]{Class \tcode{steady_clock}}
 \indexlibrary{\idxcode{steady_clock}}%
 
-\pnum
-Objects of class \tcode{steady_clock} represent clocks for which values of \tcode{time_point}
-never decrease as physical time advances and for which values of \tcode{time_point} advance at
-a steady rate relative to real time. That is, the clock may not be adjusted.
-
 \begin{codeblock}
 namespace std::chrono {
   class steady_clock {
@@ -20881,13 +20876,13 @@ namespace std::chrono {
 }
 \end{codeblock}
 
+\pnum
+Objects of class \tcode{steady_clock} represent clocks for which values of \tcode{time_point}
+never decrease as physical time advances and for which values of \tcode{time_point} advance at
+a steady rate relative to real time. That is, the clock may not be adjusted.
+
 \rSec3[time.clock.hires]{Class \tcode{high_resolution_clock}}
 \indexlibrary{\idxcode{high_resolution_clock}}%
-
-\pnum
-Objects of class \tcode{high_resolution_clock} represent clocks with the
-shortest tick period. \tcode{high_resolution_clock} may be a synonym for
-\tcode{system_clock} or \tcode{steady_clock}.
 
 \begin{codeblock}
 namespace std::chrono {
@@ -20903,6 +20898,11 @@ namespace std::chrono {
   };
 }
 \end{codeblock}
+
+\pnum
+Objects of class \tcode{high_resolution_clock} represent clocks with the
+shortest tick period. \tcode{high_resolution_clock} may be a synonym for
+\tcode{system_clock} or \tcode{steady_clock}.
 
 \rSec3[time.clock.local]{Local time}
 \indexlibrary{\idxcode{local_time}}%
@@ -21326,16 +21326,4045 @@ the \tcode{clock_cast} is ambiguous and the program is ill-formed.
 The best well-formed clock time conversion expression in the above list.
 \end{itemdescr}
 
+\rSec2[time.calendar]{The civil calendar}
+
+\pnum
+The types in this subclause describe the civil (Gregorian) calendar
+and its relationship to \tcode{sys_days} and \tcode{local_days}.
+
+\rSec3[time.calendar.last]{Class \tcode{last_spec}}
+\indexlibrary{\idxcode{last_spec}}%
+
+\begin{codeblock}
+namespace std::chrono {
+  struct last_spec {
+    explicit last_spec() = default;
+  };
+}
+\end{codeblock}
+
+\pnum
+The type \tcode{last_spec} is used
+in conjunction with other calendar types
+to specify the last in a sequence.
+For example, depending on context,
+it can represent the last day of a month,
+or the last day of the week of a month.
+
+\rSec3[time.calendar.day]{Class \tcode{day}}
+\indexlibrary{\idxcode{day}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class day {
+    unsigned char d_;           // \expos
+  public:
+    day() = default;
+    explicit constexpr day(unsigned d) noexcept;
+
+    constexpr day& operator++()    noexcept;
+    constexpr day  operator++(int) noexcept;
+    constexpr day& operator--()    noexcept;
+    constexpr day  operator--(int) noexcept;
+
+    constexpr day& operator+=(const days& d) noexcept;
+    constexpr day& operator-=(const days& d) noexcept;
+
+    explicit constexpr operator unsigned() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{day} represents a day of a month.
+It normally holds values in the range 1 to 31,
+but may hold non-negative values outside this range.
+It can be constructed with any \tcode{unsigned} value,
+which will be subsequently truncated to fit into \tcode{day}'s unspecified internal storage.
+\tcode{day} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
+and participates in basic arithmetic with \tcode{days} objects,
+which represent a difference between two \tcode{day} objects.
+
+\pnum
+\tcode{day} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{day}!constructor}%
+\begin{itemdecl}
+explicit constexpr day(unsigned d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{day} by
+initializing \tcode{d_} with \tcode{d}.
+The value held is unspecified if \tcode{d} is not in the range \crange{0}{255}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{day}%
+\begin{itemdecl}
+constexpr day& operator++() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{++d_}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{day}%
+\begin{itemdecl}
+constexpr day operator++(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{++(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{day}%
+\begin{itemdecl}
+constexpr day& operator--() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{--d_}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{day}%
+\begin{itemdecl}
+constexpr day operator--(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{--(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{day}%
+\begin{itemdecl}
+constexpr day& operator+=(const days& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + d}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{day}%
+\begin{itemdecl}
+constexpr day& operator-=(const days& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - d}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator unsigned}{day}%
+\begin{itemdecl}
+explicit constexpr operator unsigned() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{d_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{day}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{1 <= d_ \&\& d_ <= 31}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{day}%
+\begin{itemdecl}
+constexpr bool operator==(const day& x, const day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{unsigned\{x\} == unsigned\{y\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{day}%
+\begin{itemdecl}
+constexpr bool operator<(const day& x, const day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{unsigned\{x\} < unsigned\{y\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{day}%
+\begin{itemdecl}
+constexpr day operator+(const day& x, const days& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{day(unsigned\{x\} + y.count())}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{day}%
+\begin{itemdecl}
+constexpr day operator+(const days& x, const day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y + x}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{day}%
+\begin{itemdecl}
+constexpr day operator-(const day& x, const days& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x + -y}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{day}%
+\begin{itemdecl}
+constexpr days operator-(const day& x, const day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{days\{int(unsigned\{x\}) - int(unsigned\{y\})}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{day}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const day& d);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Inserts \tcode{format(fmt, d)}
+where \tcode{fmt} is \tcode{"\%d"} widened to \tcode{charT}.
+If \tcode{!d.ok()}, appends with \tcode{" is not a valid day"}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{day}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const day& d);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams \tcode{d} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{day}%
+\begin{itemdecl}
+template<class charT, class traits, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                day& d, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Attempts to parse the input stream \tcode{is}
+into the \tcode{day} \tcode{d} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid day,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{d} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\indexlibrarymember{operator""""d}{day}%
+\begin{itemdecl}
+constexpr day operator""d(unsigned long long d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{day\{static_cast<unsigned>(d)\}}.
+\end{itemdescr}
+
+\rSec3[time.calendar.month]{Class \tcode{month}}
+\indexlibrary{\idxcode{month}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class month {
+    unsigned char m_;           // \expos
+  public:
+    month() = default;
+    explicit constexpr month(unsigned m) noexcept;
+
+    constexpr month& operator++()    noexcept;
+    constexpr month  operator++(int) noexcept;
+    constexpr month& operator--()    noexcept;
+    constexpr month  operator--(int) noexcept;
+
+    constexpr month& operator+=(const months& m) noexcept;
+    constexpr month& operator-=(const months& m) noexcept;
+
+    explicit constexpr operator unsigned() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{month} represents a month of a year.
+It normally holds values in the range 1 to 12,
+but may hold non-negative values outside this range.
+It can be constructed with any \tcode{unsigned} value,
+which will be subsequently truncated to fit into \tcode{month}'s unspecified internal storage.
+\tcode{month} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
+and participates in basic arithmetic with \tcode{months} objects,
+which represent a difference between two \tcode{month} objects.
+
+\pnum
+\tcode{month} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{month}!constructor}%
+\begin{itemdecl}
+explicit constexpr month(unsigned m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{month} by
+initializing \tcode{m_} with \tcode{m}.
+The value held is unspecified if \tcode{m} is not in the range \crange{0}{255}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{month}%
+\begin{itemdecl}
+constexpr month& month::operator++() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this += months\{1\}}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{month}%
+\begin{itemdecl}
+constexpr month operator++(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{++(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{month}%
+\begin{itemdecl}
+constexpr month& operator--() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this -= months\{1\}}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{month}%
+\begin{itemdecl}
+constexpr month operator--(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{--(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{month}%
+\begin{itemdecl}
+constexpr month& operator+=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{month}%
+\begin{itemdecl}
+constexpr month& operator-=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator unsigned}{month}%
+\begin{itemdecl}
+explicit constexpr month::operator unsigned() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{month}%
+\begin{itemdecl}
+constexpr bool month::ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{1 <= m_ \&\& m_ <= 12}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{month}%
+\begin{itemdecl}
+constexpr bool operator==(const month& x, const month& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{unsigned\{x\} == unsigned\{y\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{month}%
+\begin{itemdecl}
+constexpr bool operator<(const month& x, const month& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{unsigned\{x\} < unsigned\{y\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{month}%
+\begin{itemdecl}
+constexpr month operator+(const month& x, const months& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+month{modulo(static_cast<long long>(unsigned{x}) + (y.count() - 1), 12) + 1}
+\end{codeblock}
+where \tcode{modulo(n, 12)} computes the remainder of \tcode{n} divided by 12 using Euclidean division.
+\begin{note}
+Given a divisor of 12, Euclidean division truncates towards negative infinity and
+always produces a remainder in the range of \crange{0}{11}.
+Assuming no overflow in the signed summation,
+this operation results in a \tcode{month} holding a value in the range \crange{1}{12} even if \tcode{!x.ok()}.
+\end{note}
+\begin{example}
+\tcode{February + months\{11\} == January}.
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{month}%
+\begin{itemdecl}
+constexpr month operator+(const months& x, const month& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y + x}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{month}%
+\begin{itemdecl}
+constexpr month operator-(const month& x, const months& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x + -y}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{month}%
+\begin{itemdecl}
+constexpr months operator-(const month& x, const month& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{x.ok() == true}
+and \tcode{y.ok() == true},
+returns a value \tcode{m}
+in the range \crange{months\{0\}}{months\{11\}}
+satisfying \tcode{y + m == x}.
+Otherwise the value returned is unspecified.
+\begin{example}
+\tcode{January - February == months\{11\}}.
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{month}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const month& m);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{m.ok() == true}
+inserts \tcode{format(os.getloc(), fmt, m)}
+where fmt is \tcode{"\%b"} widened to \tcode{charT}.
+Otherwise inserts \tcode{unsigned\{m\} << " is not a valid month"}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{month}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const month& m);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams \tcode{m} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{month}%
+\begin{itemdecl}
+template<class charT, class traits, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                month& m, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Attempts to parse the input stream \tcode{is}
+into the \tcode{month} \tcode{m} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid month,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{m} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.calendar.year]{Class \tcode{year}}
+\indexlibrary{\idxcode{year}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class year {
+    short y_;                   // \expos
+  public:
+    year() = default;
+    explicit constexpr year(int y) noexcept;
+
+    constexpr year& operator++()    noexcept;
+    constexpr year  operator++(int) noexcept;
+    constexpr year& operator--()    noexcept;
+    constexpr year  operator--(int) noexcept;
+
+    constexpr year& operator+=(const years& y) noexcept;
+    constexpr year& operator-=(const years& y) noexcept;
+
+    constexpr year operator+() const noexcept;
+    constexpr year operator-() const noexcept;
+
+    constexpr bool is_leap() const noexcept;
+
+    explicit constexpr operator int() const noexcept;
+    constexpr bool ok() const noexcept;
+
+    static constexpr year min() noexcept;
+    static constexpr year max() noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{year} represents a year in the civil calendar.
+It can represent values in the range \crange{min()}{max()}.
+It can be constructed with any \tcode{int} value,
+which will be subsequently truncated to fit into \tcode{year}'s unspecified internal storage.
+\tcode{year} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
+and participates in basic arithmetic with \tcode{years} objects,
+which represent a difference between two \tcode{year} objects.
+
+\pnum
+\tcode{year} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{year}!constructor}%
+\begin{itemdecl}
+explicit constexpr year(int y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year} by
+initializing \tcode{y_} with \tcode{y}.
+The value held is unspecified if \tcode{y} is not in the range \crange{-32767}{32767}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{year}%
+\begin{itemdecl}
+constexpr year& operator++() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{++y_}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{year}%
+\begin{itemdecl}
+constexpr year operator++(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{++(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{year}%
+\begin{itemdecl}
+constexpr year& operator--() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{--y_}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{year}%
+\begin{itemdecl}
+constexpr year operator--(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{--(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year}%
+\begin{itemdecl}
+constexpr year& operator+=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year}%
+\begin{itemdecl}
+constexpr year& operator-=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year}%
+\begin{itemdecl}
+constexpr year operator+() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year}%
+\begin{itemdecl}
+constexpr year year::operator-() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year\{-y_\}}.
+\end{itemdescr}
+
+\indexlibrarymember{is_leap}{year}%
+\begin{itemdecl}
+constexpr bool is_leap() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_ \% 4 == 0 \&\& (y_ \% 100 != 0 || y_ \% 400 == 0)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator int}{year}%
+\begin{itemdecl}
+explicit constexpr operator int() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{year}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{min() <= y_ \&\& y_ <= max()}.
+\end{itemdescr}
+
+\indexlibrarymember{min}{year}%
+\begin{itemdecl}
+static constexpr year min() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year\{-32767\}}.
+\end{itemdescr}
+
+\indexlibrarymember{max}{year}%
+\begin{itemdecl}
+static constexpr year max() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year\{32767\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{year}%
+\begin{itemdecl}
+constexpr bool operator==(const year& x, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{int\{x\} == int\{y\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{year}%
+\begin{itemdecl}
+constexpr bool operator<(const year& x, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{int\{x\} < int\{y\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year}%
+\begin{itemdecl}
+constexpr year operator+(const year& x, const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year\{int\{x\} + y.count()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year}%
+\begin{itemdecl}
+constexpr year operator+(const years& x, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y + x}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year}%
+\begin{itemdecl}
+constexpr year operator-(const year& x, const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x + -y}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year}%
+\begin{itemdecl}
+constexpr years operator-(const year& x, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{years\{int\{x\} - int\{y\}\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{year}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const year& y);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Inserts \tcode{format(fmt, y)} where \tcode{fmt} is
+\tcode{"\%Y"} widened to \tcode{charT}.
+If \tcode{!y.ok()}, appends with \tcode{" is not a valid year"}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{year}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const year& y);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Streams \tcode{y} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{year}%
+\begin{itemdecl}
+template<class charT, class traits, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                year& y, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Attempts to parse the input stream \tcode{is}
+into the \tcode{year} \tcode{y} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid year,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{y} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\indexlibrarymember{operator""""y}{year}%
+\begin{itemdecl}
+constexpr year operator""y(unsigned long long y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year\{static_cast<int>(y)\}}.
+\end{itemdescr}
+
+\rSec3[time.calendar.weekday]{Class \tcode{weekday}}
+\indexlibrary{\idxcode{weekday}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class weekday {
+    unsigned char wd_;          // \expos
+  public:
+    weekday() = default;
+    explicit constexpr weekday(unsigned wd) noexcept;
+    constexpr weekday(const sys_days& dp) noexcept;
+    explicit constexpr weekday(const local_days& dp) noexcept;
+
+    constexpr weekday& operator++()    noexcept;
+    constexpr weekday  operator++(int) noexcept;
+    constexpr weekday& operator--()    noexcept;
+    constexpr weekday  operator--(int) noexcept;
+
+    constexpr weekday& operator+=(const days& d) noexcept;
+    constexpr weekday& operator-=(const days& d) noexcept;
+
+    explicit constexpr operator unsigned() const noexcept;
+    constexpr bool ok() const noexcept;
+
+    constexpr weekday_indexed operator[](unsigned index) const noexcept;
+    constexpr weekday_last    operator[](last_spec) const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{weekday} represents a day of the week in the civil calendar.
+It normally holds values in the range \tcode{0} to \tcode{6},
+corresponding to Sunday through Saturday, but
+it may hold non-negative values outside this range.
+It can be constructed with any \tcode{unsigned} value,
+which will be subsequently truncated to fit into \tcode{weekday}'s unspecified internal storage.
+\tcode{weekday} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable}).
+\begin{note}
+\tcode{weekday} is not
+\tcode{LessThanComparable}
+because there is no universal consensus on which day is the first day of the week.
+\tcode{weekday}'s arithmetic operations treat the days of the week as a circular range,
+with no beginning and no end.
+\end{note}
+
+\pnum
+\tcode{weekday} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{weekday}!constructor}%
+\begin{itemdecl}
+explicit constexpr weekday(unsigned wd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{weekday} by
+initializing \tcode{wd_} with \tcode{wd}.
+The value held is unspecified if \tcode{wd} is not in the range \crange{0}{255}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{weekday}!constructor}%
+\begin{itemdecl}
+constexpr weekday(const sys_days& dp) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{weekday} by
+computing what day of the week corresponds to the \tcode{sys_days} \tcode{dp},
+and representing that day of the week in \tcode{wd_}.
+
+\pnum
+\begin{example}
+If \tcode{dp} represents 1970-01-01,
+the constructed \tcode{weekday} represents Thursday
+by storing \tcode{4} in \tcode{wd_}.
+\end{example}
+\end{itemdescr}
+
+\indexlibrary{\idxcode{weekday}!constructor}%
+\begin{itemdecl}
+explicit constexpr weekday(const local_days& dp) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{weekday} by
+computing what day of the week corresponds to the \tcode{local_days} \tcode{dp},
+and representing that day of the week in \tcode{wd_}.
+
+\pnum
+\remarks
+The value after construction is identical to that constructed from
+\tcode{sys_days\{dp.time_since_epoch()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{weekday}%
+\begin{itemdecl}
+constexpr weekday& operator++() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this += days\{1\}}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator++}{weekday}%
+\begin{itemdecl}
+constexpr weekday operator++(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{++(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{weekday}%
+\begin{itemdecl}
+constexpr weekday& operator--() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this -= days\{1\}}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator--}{weekday}%
+\begin{itemdecl}
+constexpr weekday operator--(int) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{--(*this)}.
+
+\pnum
+\returns A copy of \tcode{*this} as it existed on entry to this member function.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{weekday}%
+\begin{itemdecl}
+constexpr weekday& operator+=(const days& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + d}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{weekday}%
+\begin{itemdecl}
+constexpr weekday& operator-=(const days& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - d}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator unsigned}{weekday}%
+\begin{itemdecl}
+explicit constexpr operator unsigned() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wd_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{weekday}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wd_ <= 6}.
+\end{itemdescr}
+
+\indexlibrarymember{operator[]}{weekday}%
+\begin{itemdecl}
+constexpr weekday_indexed weekday::operator[](unsigned index) const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{*this, index\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator[]}{weekday}%
+\begin{itemdecl}
+constexpr weekday_last weekday::operator[](last_spec) const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{weekday_last\{*this\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{weekday}%
+\begin{itemdecl}
+constexpr bool operator==(const weekday& x, const weekday& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{unsigned\{x\} == unsigned\{y\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{weekday}%
+\begin{itemdecl}
+constexpr weekday operator+(const weekday& x, const days& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+weekday{modulo(static_cast<long long>(unsigned{x}) + y.count(), 7)}
+\end{codeblock}
+where \tcode{modulo(n, 7)} computes the remainder of \tcode{n} divided by 7 using Euclidean division.
+\begin{note}
+Given a divisor of 7, Euclidean division truncates towards negative infinity and
+always produces a remainder in the range of \crange{0}{6}.
+Assuming no overflow in the signed summation,
+this operation results in a \tcode{weekday} holding a value in the range \crange{0}{6} even if \tcode{!x.ok()}.
+\end{note}
+\begin{example}
+\tcode{Monday + days\{6\} == Sunday}.
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{weekday}%
+\begin{itemdecl}
+constexpr weekday operator+(const days& x, const weekday& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y + x}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{weekday}%
+\begin{itemdecl}
+constexpr weekday operator-(const weekday& x, const days& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x + -y}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{weekday}%
+\begin{itemdecl}
+constexpr days operator-(const weekday& x, const weekday& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{x.ok() == true}
+and \tcode{y.ok() == true},
+returns a value \tcode{d}
+in the range \crange{days\{0\}}{days\{6\}}
+satisfying \tcode{y + d == x}.
+Otherwise the value returned is unspecified.
+\begin{example}
+\tcode{Sunday - Monday == days\{6\}}.
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{weekday}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const weekday& wd);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{wd.ok() == true}
+inserts \tcode{format(os.getloc(), fmt, wd)}
+where \tcode{fmt} is \tcode{"\%a"} widened to \tcode{charT}.
+Otherwise inserts \tcode{unsigned\{wd\} << " is not a valid weekday"}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{weekday}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const weekday& wd);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Streams \tcode{wd} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{weekday}%
+\begin{itemdecl}
+template<class charT, class traits, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                weekday& wd, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Attempts to parse the input stream \tcode{is}
+into the \tcode{weekday} \tcode{wd} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid weekday,
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{wd} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.calendar.weekday.indexed]{Class \tcode{weekday_indexed}}
+\indexlibrary{\idxcode{weekday_indexed}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class weekday_indexed {
+    chrono::weekday  wd_;       // \expos
+    unsigned char    index_;    // \expos
+
+  public:
+    weekday_indexed() = default;
+    constexpr weekday_indexed(const chrono::weekday& wd, unsigned index) noexcept;
+
+    constexpr chrono::weekday weekday() const noexcept;
+    constexpr unsigned        index()   const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{weekday_indexed} represents a \tcode{weekday}
+and a small index in the range 1 to 5.
+This class is used to represent the
+first, second, third, fourth, or fifth weekday of a month.
+
+\pnum
+\begin{note}
+A \tcode{weekday_indexed} object
+can be constructed by indexing a \tcode{weekday}
+with an \tcode{unsigned}.
+\end{note}
+\begin{example}
+\begin{codeblock}
+constexpr auto wdi = Sunday[2]; // \tcode{wdi} is the second Sunday of an as yet unspecified month
+static_assert(wdi.weekday() == Sunday);
+static_assert(wdi.index() == 2);
+\end{codeblock}
+\end{example}
+
+\pnum
+\tcode{weekday_indexed} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{weekday_indexed}!constructor}%
+\begin{itemdecl}
+constexpr weekday_indexed(const chrono::weekday& wd, unsigned index) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{weekday_indexed} by
+initializing \tcode{wd_} with \tcode{wd} and \tcode{index_} with \tcode{index}.
+The values held are unspecified if \tcode{!wd.ok()} or \tcode{index} is not in the range \crange{1}{5}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday}{weekday_indexed}%
+\begin{itemdecl}
+constexpr chrono::weekday weekday() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wd_}.
+\end{itemdescr}
+
+\indexlibrarymember{index}{weekday_indexed}%
+\begin{itemdecl}
+constexpr unsigned index() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{index_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{weekday_indexed}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wd_.ok() \&\& 1 <= index_ \&\& index_ <= 5}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{weekday_indexed}%
+\begin{itemdecl}
+constexpr bool operator==(const weekday_indexed& x, const weekday_indexed& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.weekday() == y.weekday() \&\& x.index() == y.index()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{weekday_indexed}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const weekday_indexed& wdi);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+\tcode{os << wdi.weekday() << '[' << wdi.index()}.
+If \tcode{wdi.index()} is in the range \crange{1}{5},
+appends with \tcode{']'},
+otherwise
+appends with \tcode{" is not a valid index]"}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\rSec3[time.calendar.weekday.last]{Class \tcode{weekday_last}}
+\indexlibrary{\idxcode{weekday_last}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class weekday_last {
+    chrono::weekday wd_;                // \expos
+
+    public:
+    explicit constexpr weekday_last(const chrono::weekday& wd) noexcept;
+
+    constexpr chrono::weekday weekday() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{weekday_last} represents the last weekday of a month.
+
+\pnum
+\begin{note}
+A \tcode{weekday_last} object
+can be constructed by indexing a \tcode{weekday} with \tcode{last}.
+\end{note}
+\begin{example}
+\begin{codeblock}
+constexpr auto wdl = Sunday[last];      // \tcode{wdl} is the last Sunday of an as yet unspecified month
+static_assert(wdl.weekday() == Sunday);
+\end{codeblock}
+\end{example}
+
+\pnum
+\tcode{weekday_last} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{weekday_last}!constructor}%
+\begin{itemdecl}
+explicit constexpr weekday_last(const chrono::weekday& wd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{weekday_last} by
+initializing \tcode{wd_} with \tcode{wd}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday_last}{weekday}%
+\begin{itemdecl}
+constexpr chrono::weekday weekday() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wd_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{weekday_last}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wd_.ok()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{weekday_last}%
+\begin{itemdecl}
+constexpr bool operator==(const weekday_last& x, const weekday_last& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.weekday() == y.weekday()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{weekday_last}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const weekday_last& wdl);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << wdl.weekday() << "[last]"}.
+\end{itemdescr}
+
+\rSec3[time.calendar.month.day]{Class \tcode{month_day}}
+\indexlibrary{\idxcode{month_day}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class month_day {
+    chrono::month m_;           // \expos
+    chrono::day   d_;           // \expos
+
+  public:
+    month_day() = default;
+    constexpr month_day(const chrono::month& m, const chrono::day& d) noexcept;
+
+    constexpr chrono::month month() const noexcept;
+    constexpr chrono::day   day()   const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{month_day} represents a specific day of a specific month,
+but with an unspecified year.
+\tcode{month_day} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}).
+
+\pnum
+\tcode{month_day} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{month_day}!constructor}%
+\begin{itemdecl}
+constexpr month_day(const chrono::month& m, const chrono::day& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{month_day} by
+initializing \tcode{m_} with \tcode{m}, and \tcode{d_} with \tcode{d}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{month_day}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{day}{month_day}%
+\begin{itemdecl}
+constexpr chrono::day day() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{d_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{month_day}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\tcode{true} if
+\tcode{m_.ok()} is \tcode{true},
+\tcode{1d <= d_}, and
+\tcode{d_} is less than or equal to the number of days in month \tcode{m_};
+otherwise returns \tcode{false}.
+When \tcode{m_ == February},
+the number of days is considered to be 29.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{month_day}%
+\begin{itemdecl}
+constexpr bool operator==(const month_day& x, const month_day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.month() == y.month() \&\& x.day() == y.day()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{month_day}%
+\begin{itemdecl}
+constexpr bool operator<(const month_day& x, const month_day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{x.month() < y.month()} returns \tcode{true}.
+Otherwise, if \tcode{x.month() > y.month()} returns \tcode{false}.
+Otherwise, returns \tcode{x.day() < y.day()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{month_day}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const month_day& md);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << md.month() << '/' << md.day()}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{month_day}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const month_day& md);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Streams \tcode{md} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{month_day}%
+\begin{itemdecl}
+template<class charT, class traits, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                month_day& md, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Attempts to parse the input stream \tcode{is}
+into the \tcode{month_day} \tcode{md} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid \tcode{month_day},
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{md} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.calendar.month.day.last]{Class \tcode{month_day_last}}
+\indexlibrary{\idxcode{month_day_last}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class month_day_last {
+    chrono::month m_;                   // \expos
+
+  public:
+    explicit constexpr month_day_last(const chrono::month& m) noexcept;
+
+    constexpr chrono::month month() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{month_day_last} represents the last day of a month.
+
+\pnum
+\begin{note}
+A \tcode{month_day_last} object
+can be constructed using the expression \tcode{m/last} or \tcode{last/m},
+where \tcode{m} is an expression of type \tcode{month}.
+\end{note}
+\begin{example}
+\begin{codeblock}
+constexpr auto mdl = February/last;     // \tcode{mdl} is the last day of February of an as yet unspecified year
+static_assert(mdl.month() == February);
+\end{codeblock}
+\end{example}
+
+\pnum
+\tcode{month_day_last} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{month_day_last}!constructor}%
+\begin{itemdecl}
+explicit constexpr month_day_last(const chrono::month& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{month_day_last} by
+initializing \tcode{m_} with \tcode{m}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{month_day_last}%
+\begin{itemdecl}
+constexpr month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{month_day_last}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_.ok()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{month_day_last}%
+\begin{itemdecl}
+constexpr bool operator==(const month_day_last& x, const month_day_last& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.month() == y.month()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{month_day_last}%
+\begin{itemdecl}
+constexpr bool operator<(const month_day_last& x, const month_day_last& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.month() < y.month()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{month_day_last}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const month_day_last& mdl);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << mdl.month() << "/last"}.
+\end{itemdescr}
+
+\rSec3[time.calendar.month.weekday]{Class \tcode{month_weekday}}
+\indexlibrary{\idxcode{month_weekday}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class month_weekday {
+    chrono::month           m_;         // \expos
+    chrono::weekday_indexed wdi_;       // \expos
+  public:
+    constexpr month_weekday(const chrono::month& m, const chrono::weekday_indexed& wdi) noexcept;
+
+    constexpr chrono::month           month()           const noexcept;
+    constexpr chrono::weekday_indexed weekday_indexed() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{month_weekday} represents the n$^\textrm{th}$ weekday of a month,
+of an as yet unspecified year.
+To do this the \tcode{month_weekday} stores a \tcode{month} and a \tcode{weekday_indexed}.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+constexpr auto mwd
+    = February/Tueday[3];               // \tcode{mwd} is the third Tuesday of February of an as yet unspecified year
+static_assert(mwd.month() == February);
+static_assert(mwd.weekday_indexed() == Tueday[3]);
+\end{codeblock}
+\end{example}
+
+\pnum
+\tcode{month_weekday} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{month_weekday}!constructor}%
+\begin{itemdecl}
+constexpr month_weekday(const chrono::month& m, const chrono::weekday_indexed& wdi) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{month_weekday} by
+initializing \tcode{m_} with \tcode{m}, and \tcode{wdi_} with \tcode{wdi}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{month_weekday}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday_indexed}{month_weekday}%
+\begin{itemdecl}
+constexpr chrono::weekday_indexed weekday_indexed() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wdi_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{month_weekday}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_.ok() \&\& wdi_.ok()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{month_weekday}%
+\begin{itemdecl}
+constexpr bool operator==(const month_weekday& x, const month_weekday& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.month() == y.month() \&\& x.weekday_indexed() == y.weekday_indexed()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{month_weekday}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const month_weekday& mwd);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << mwd.month() << '/' << mwd.weekday_indexed()}.
+\end{itemdescr}
+
+\rSec3[time.calendar.month.weekday.last]{Class \tcode{month_weekday_last}}
+\indexlibrary{\idxcode{month_weekday_last}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class month_weekday_last {
+    chrono::month        m_;    // \expos
+    chrono::weekday_last wdl_;  // \expos
+  public:
+    constexpr month_weekday_last(const chrono::month& m,
+                                 const chrono::weekday_last& wdl) noexcept;
+
+    constexpr chrono::month        month()        const noexcept;
+    constexpr chrono::weekday_last weekday_last() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{month_weekday_last} represents the last weekday of a month,
+of an as yet unspecified year.
+To do this the \tcode{month_weekday_last} stores a \tcode{month} and a \tcode{weekday_last}.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+constexpr auto mwd
+    = February/Tueday[last];    // \tcode{mwd} is the last Tuesday of February of an as yet unspecified year
+static_assert(mwd.month() == February);
+static_assert(mwd.weekday_last() == Tueday[last]);
+\end{codeblock}
+\end{example}
+
+\pnum
+\tcode{month_weekday_last} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{month_weekday_last}!constructor}%
+\begin{itemdecl}
+constexpr month_weekday_last(const chrono::month& m,
+                             const chrono::weekday_last& wdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{month_weekday_last} by
+initializing \tcode{m_} with \tcode{m}, and \tcode{wdl_} with \tcode{wdl}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{month_weekday_last}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday_last}{month_weekday_last}%
+\begin{itemdecl}
+constexpr chrono::weekday_last weekday_last() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wdl_}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{month_weekday_last}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_.ok() \&\& wdl_.ok()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{month_weekday_last}%
+\begin{itemdecl}
+constexpr bool operator==(const month_weekday_last& x, const month_weekday_last& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.month() == y.month() \&\& x.weekday_last() == y.weekday_last()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{month_weekday_last}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const month_weekday_last& mwdl);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << mwdl.month() << '/' << mwdl.weekday_last()}.
+\end{itemdescr}
+
+\rSec3[time.calendar.year.month]{Class \tcode{year_month}}
+\indexlibrary{\idxcode{year_month}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class year_month {
+    chrono::year  y_;           // \expos
+    chrono::month m_;           // \expos
+
+  public:
+    year_month() = default;
+    constexpr year_month(const chrono::year& y, const chrono::month& m) noexcept;
+
+    constexpr chrono::year  year()  const noexcept;
+    constexpr chrono::month month() const noexcept;
+
+    constexpr year_month& operator+=(const months& dm) noexcept;
+    constexpr year_month& operator-=(const months& dm) noexcept;
+    constexpr year_month& operator+=(const years& dy)  noexcept;
+    constexpr year_month& operator-=(const years& dy)  noexcept;
+
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{year_month} represents a specific month of a specific year,
+but with an unspecified day.
+\tcode{year_month} is a field-based time point with a resolution of \tcode{months}.
+\tcode{year_month} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}).
+
+\pnum
+\tcode{year_month} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{year_month}!constructor}%
+\begin{itemdecl}
+constexpr year_month(const chrono::year& y, const chrono::month& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month} by
+initializing \tcode{y_} with \tcode{y}, and \tcode{m_} with \tcode{m}.
+\end{itemdescr}
+
+\indexlibrarymember{year}{year_month}%
+\begin{itemdecl}
+constexpr chrono::year year() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{year_month}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month}%
+\begin{itemdecl}
+constexpr year_month& operator+=(const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + dm}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month}%
+\begin{itemdecl}
+constexpr year_month& operator-=(const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - dm}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month}%
+\begin{itemdecl}
+constexpr year_month& operator+=(const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + dy}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month}%
+\begin{itemdecl}
+constexpr year_month& operator-=(const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - dy}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{year_month}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_.ok() \&\& m_.ok()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{year_month}%
+\begin{itemdecl}
+constexpr bool operator==(const year_month& x, const year_month& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.year() == y.year() \&\& x.month() == y.month()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{year_month}%
+\begin{itemdecl}
+constexpr bool operator<(const year_month& x, const year_month& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{x.year() < y.year()} returns \tcode{true}.
+Otherwise, if \tcode{x.year() > y.year()} returns \tcode{false}.
+Otherwise, returns \tcode{x.month() < y.month()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month}%
+\begin{itemdecl}
+constexpr year_month operator+(const year_month& ym, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns A \tcode{year_month} value \tcode{z} such that \tcode{z - ym == dm}.
+
+\complexity
+\bigoh{1} with respect to the value of \tcode{dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month}%
+\begin{itemdecl}
+constexpr year_month operator+(const months& dm, const year_month& ym) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ym + dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month}%
+\begin{itemdecl}
+constexpr year_month operator-(const year_month& ym, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ym + -dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month}%
+\begin{itemdecl}
+constexpr months operator-(const year_month& x, const year_month& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+x.year() - y.year() + months{static_cast<int>(unsigned{x.month()}) -
+                             static_cast<int>(unsigned{y.month()})}
+\end{codeblock}
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month}%
+\begin{itemdecl}
+constexpr year_month operator+(const year_month& ym, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{(ym.year() + dy) / ym.month()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month}%
+\begin{itemdecl}
+constexpr year_month operator+(const years& dy, const year_month& ym) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ym + dy}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month}%
+\begin{itemdecl}
+constexpr year_month operator-(const year_month& ym, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ym + -dy}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{year_month}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const year_month& ym);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << ym.year() << '/' << ym.month()}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{year_month}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const year_month& ym);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Streams \tcode{ym} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{year_month}%
+\begin{itemdecl}
+template<class charT, class traits, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                year_month& ym, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Attempts to parse the input stream \tcode{is}
+into the \tcode{year_month} \tcode{ym} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid \tcode{year_month},
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{ym} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.calendar.year.month.day]{Class \tcode{year_month_day}}
+\indexlibrary{\idxcode{year_month_day}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class year_month_day {
+    chrono::year  y_;           // \expos
+    chrono::month m_;           // \expos
+    chrono::day   d_;           // \expos
+
+  public:
+    year_month_day() = default;
+    constexpr year_month_day(const chrono::year& y, const chrono::month& m,
+                             const chrono::day& d) noexcept;
+    constexpr year_month_day(const year_month_day_last& ymdl) noexcept;
+    constexpr year_month_day(const sys_days& dp) noexcept;
+    explicit constexpr year_month_day(const local_days& dp) noexcept;
+
+    constexpr year_month_day& operator+=(const months& m) noexcept;
+    constexpr year_month_day& operator-=(const months& m) noexcept;
+    constexpr year_month_day& operator+=(const years& y)  noexcept;
+    constexpr year_month_day& operator-=(const years& y)  noexcept;
+
+    constexpr chrono::year  year()  const noexcept;
+    constexpr chrono::month month() const noexcept;
+    constexpr chrono::day   day()   const noexcept;
+
+    constexpr          operator sys_days()   const noexcept;
+    explicit constexpr operator local_days() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{year_month_day} represents a specific year, month, and day.
+\tcode{year_month_day} is a field-based time point with a resolution of \tcode{days}.
+\begin{note}
+\tcode{year_month_day} supports \tcode{years}- and \tcode{months}-oriented arithmetic,
+but not \tcode{days}-oriented arithmetic.
+For the latter, there is a conversion to \tcode{sys_days},
+which efficiently supports \tcode{days}-oriented arithmetic.
+\end{note}
+\tcode{year_month_day} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
+
+\pnum
+\tcode{year_month_day} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{year_month_day}!constructor}%
+\begin{itemdecl}
+constexpr year_month_day(const chrono::year& y, const chrono::month& m,
+                         const chrono::day& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_day} by
+initializing
+\tcode{y_} with \tcode{y},
+\tcode{m_} with \tcode{m}, and
+\tcode{d_} with \tcode{d}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{year_month_day}!constructor}%
+\begin{itemdecl}
+constexpr year_month_day(const year_month_day_last& ymdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_day} by
+initializing
+\tcode{y_} with \tcode{ymdl.year()},
+\tcode{m_} with \tcode{ymdl.month()}, and
+\tcode{d_} with \tcode{ymdl.day()}.
+\begin{note}
+This conversion from \tcode{year_month_day_last} to \tcode{year_month_day}
+may be more efficient than converting a \tcode{year_month_day_last} to a \tcode{sys_days},
+and then converting that \tcode{sys_days} to a \tcode{year_month_day}.
+\end{note}
+\end{itemdescr}
+
+\indexlibrary{\idxcode{year_month_day}!constructor}%
+\begin{itemdecl}
+constexpr year_month_day(const sys_days& dp) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_day}
+that corresponds to the date represented by \tcode{dp}.
+
+\pnum
+\remarks
+For any value \tcode{ymd} of type \tcode{year_month_day}
+for which \tcode{ymd.ok()} is \tcode{true},
+\tcode{ymd == year_month_day\{sys_days\{ymd\}\}}
+is \tcode{true}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{year_month_day}!constructor}%
+\begin{itemdecl}
+explicit constexpr year_month_day(const local_days& dp) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_day}
+that corresponds to the date represented by \tcode{dp}.
+
+\pnum
+\remarks
+Equivalent to constructing with \tcode{sys_days\{dp.time_since_epoch()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day& operator+=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day& operator-=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day& year_month_day::operator+=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day& year_month_day::operator-=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{year}{year_month_day}%
+\begin{itemdecl}
+constexpr chrono::year year() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{year_month_day}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{day}{year_month_day}%
+\begin{itemdecl}
+constexpr chrono::day day() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{d_}.
+\end{itemdescr}
+
+\indexlibrarymember{operator sys_days}{year_month_day}%
+\begin{itemdecl}
+constexpr operator sys_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{ok()},
+returns a \tcode{sys_days}
+holding a count of days from the \tcode{sys_days} epoch to \tcode{*this}
+(a negative value if \tcode{*this} represents a date prior to the \tcode{sys_days} epoch).
+Otherwise, if \tcode{y_.ok() \&\& m_.ok()} is \tcode{true},
+returns a \tcode{sys_days}
+which is offset from \tcode{sys_days\{y_/m_/last\}}
+by the number of days \tcode{d_} is offset from \tcode{sys_days\{y_/m_/last\}.day()}.
+Otherwise the value returned is unspecified.
+
+\pnum
+\remarks
+A \tcode{sys_days} in the range \crange{days\{-12687428\}}{days\{11248737\}}
+which is converted to a \tcode{year_month_day}
+shall have the same value when converted back to a \tcode{sys_days}.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+static_assert(year_month_day{sys_days{2017y/January/0}}  == 2016y/December/31);
+static_assert(year_month_day{sys_days{2017y/January/31}} == 2017y/January/31);
+static_assert(year_month_day{sys_days{2017y/January/32}} == 2017y/February/1);
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator local_days}{year_month_day}%
+\begin{itemdecl}
+explicit constexpr operator local_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{local_days\{sys_days\{*this\}.time_since_epoch()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{year_month_day}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{y_.ok()} is \tcode{true},
+and \tcode{m_.ok()} is \tcode{true},
+and \tcode{d_} is in the range \crange{1d}{(y_/m_/last).day()},
+then returns \tcode{true}; otherwise returns \tcode{false}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{year_month_day}%
+\begin{itemdecl}
+constexpr bool operator==(const year_month_day& x, const year_month_day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.year() == y.year() \&\& x.month() == y.month() \&\& x.day() == y.day()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{year_month_day}%
+\begin{itemdecl}
+constexpr bool operator<(const year_month_day& x, const year_month_day& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{x.year() < y.year()}, returns \tcode{true}.
+Otherwise, if \tcode{x.year() > y.year()}, returns \tcode{false}.
+Otherwise, if \tcode{x.month() < y.month()}, returns \tcode{true}.
+Otherwise, if \tcode{x.month() > y.month()}, returns \tcode{false}.
+Otherwise, returns \tcode{x.day() < y.day()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day operator+(const year_month_day& ymd, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{(ymd.year() / ymd.month() + dm) / ymd.day()}.
+
+\pnum
+\begin{note}
+If \tcode{ymd.day()} is in the range \crange{1d}{28d},
+\tcode{ok()} will return \tcode{true} for
+the resultant \tcode{year_month_day}.
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day operator+(const months& dm, const year_month_day& ymd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymd + dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day operator-(const year_month_day& ymd, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymd + (-dm)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day operator+(const year_month_day& ymd, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{(ymd.year() + dy) / ymd.month() / ymd.day()}.
+
+\pnum
+\begin{note}
+If \tcode{ymd.month()} is February
+and \tcode{ymd.day()} is not in the range \crange{1d}{28d},
+\tcode{ok()} may return \tcode{false} for
+the resultant \tcode{year_month_day}.
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day operator+(const years& dy, const year_month_day& ymd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymd + dy}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_day}%
+\begin{itemdecl}
+constexpr year_month_day operator-(const year_month_day& ymd, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymd + (-dy)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{year_month_day}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const year_month_day& ymd);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Inserts \tcode{format(fmt, ymd)}
+where \tcode{fmt} is \tcode{"\%F"} widened to \tcode{charT}.
+If \tcode{!ymd.ok()}, appends with \tcode{" is not a valid date"}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{year_month_day}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt, const year_month_day& ymd);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Streams \tcode{ymd} into \tcode{os} using
+the format specified by the NTCTS \tcode{fmt}.
+\tcode{fmt} encoding follows the rules specified in \ref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{from_stream}{year_month_day}%
+\begin{itemdecl}
+template<class charT, class traits, class Alloc = allocator<charT>>
+  basic_istream<charT, traits>&
+    from_stream(basic_istream<charT, traits>& is, const charT* fmt,
+                year_month_day& ymd, basic_string<charT, traits, Alloc>* abbrev = nullptr,
+                minutes* offset = nullptr);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Attempts to parse the input stream \tcode{is}
+into the \tcode{year_month_day} \tcode{ymd} using
+the format flags given in the NTCTS \tcode{fmt}
+as specified in \ref{time.parse}.
+If the parse fails to decode a valid \tcode{year_month_day},
+\tcode{is.setstate(ios_base::failbit)} shall be called
+and \tcode{ymd} shall not be modified.
+If \tcode{\%Z} is used and successfully parsed,
+that value will be assigned to \tcode{*abbrev} if \tcode{abbrev} is non-null.
+If \tcode{\%z} (or a modified variant) is used and successfully parsed,
+that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
+
+\pnum
+\returns \tcode{is}.
+\end{itemdescr}
+
+\rSec3[time.calendar.year.month.day.last]{Class \tcode{year_month_day_last}}
+\indexlibrary{\idxcode{year_month_day_last}}
+
+\pnum
+\tcode{year_month_day_last} represents the last day of a specific year and month.
+\tcode{year_month_day_last} is a field-based time point with a resolution of \tcode{days},
+except that it is restricted to pointing to the last day of a year and month.
+\begin{note}
+\tcode{year_month_day_last} supports \tcode{years}- and \tcode{months}-oriented arithmetic,
+but not \tcode{days}-oriented arithmetic.
+For the latter, there is a conversion to \tcode{sys_days},
+which efficiently supports \tcode{days}-oriented arithmetic.
+\end{note}
+\tcode{year_month_day_last} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable})
+and \tcode{LessThanComparable} (Table~\ref{tab:lessthancomparable}),
+
+\begin{codeblock}
+namespace std::chrono {
+  class year_month_day_last {
+    chrono::year           y_;          // exposition only
+    chrono::month_day_last mdl_;        // exposition only
+
+  public:
+    constexpr year_month_day_last(const chrono::year& y,
+                                  const chrono::month_day_last& mdl) noexcept;
+
+    constexpr year_month_day_last& operator+=(const months& m) noexcept;
+    constexpr year_month_day_last& operator-=(const months& m) noexcept;
+    constexpr year_month_day_last& operator+=(const years& y)  noexcept;
+    constexpr year_month_day_last& operator-=(const years& y)  noexcept;
+
+    constexpr chrono::year           year()           const noexcept;
+    constexpr chrono::month          month()          const noexcept;
+    constexpr chrono::month_day_last month_day_last() const noexcept;
+    constexpr chrono::day            day()            const noexcept;
+
+    constexpr          operator sys_days()   const noexcept;
+    explicit constexpr operator local_days() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{year_month_day_last} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{year_month_day_last}!constructor}%
+\begin{itemdecl}
+constexpr year_month_day_last(const chrono::year& y,
+                              const chrono::month_day_last& mdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_day_last} by
+initializing \tcode{y_} with \tcode{y} and \tcode{mdl_} with \tcode{mdl}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last& operator+=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last& operator-=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last& operator+=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last& operator-=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{year}{year_month_day_last}%
+\begin{itemdecl}
+constexpr chrono::year year() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{year_month_day_last}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{mdl_.month()}.
+\end{itemdescr}
+
+\indexlibrarymember{month_day_last}{year_month_day_last}%
+\begin{itemdecl}
+constexpr chrono::month_day_last month_day_last() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{mdl_}.
+\end{itemdescr}
+
+\indexlibrarymember{day}{year_month_day_last}%
+\begin{itemdecl}
+constexpr chrono::day day() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A \tcode{day} representing the last day of the (\tcode{year}, \tcode{month}) pair
+represented by \tcode{*this}.
+
+\pnum
+\begin{note}
+This value may be computed on demand.
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{operator sys_days}{year_month_day_last}%
+\begin{itemdecl}
+constexpr operator sys_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{sys_days\{year()/month()/day()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator local_days}{year_month_day_last}%
+\begin{itemdecl}
+explicit constexpr operator local_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{local_days\{sys_days\{*this\}.time_since_epoch()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{year_month_day_last}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_.ok() \&\& mdl_.ok()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{year_month_day_last}%
+\begin{itemdecl}
+constexpr bool operator==(const year_month_day_last& x, const year_month_day_last& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.year() == y.year() \&\& x.month_day_last() == y.month_day_last()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{year_month_day_last}%
+\begin{itemdecl}
+constexpr bool operator<(const year_month_day_last& x, const year_month_day_last& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{x.year() < y.year()}, returns \tcode{true}.
+Otherwise, if \tcode{x.year() > y.year()}, returns \tcode{false}.
+Otherwise, returns \tcode{x.month_day_last() < y.month_day_last()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator+(const year_month_day_last& ymdl, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{(ymdl.year() / ymdl.month() + dm) / last}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator+(const months& dm, const year_month_day_last& ymdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymdl + dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator-(const year_month_day_last& ymdl, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymdl + (-dm)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator+(const year_month_day_last& ymdl, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{ymdl.year()+dy, ymdl.month_day_last()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator+(const years& dy, const year_month_day_last& ymdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymdl + dy}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_day_last}%
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator-(const year_month_day_last& ymdl, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymdl + (-dy)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{year_month_day_last}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const year_month_day_last& ymdl);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << ymdl.year() << '/' << ymdl.month_day_last()}.
+\end{itemdescr}
+
+\rSec3[time.calendar.year.month.weekday]{Class \tcode{year_month_weekday}}
+\indexlibrary{\idxcode{year_month_weekday}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class year_month_weekday {
+    chrono::year            y_;         // exposition only
+    chrono::month           m_;         // exposition only
+    chrono::weekday_indexed wdi_;       // exposition only
+
+  public:
+    year_month_weekday() = default;
+    constexpr year_month_weekday(const chrono::year& y, const chrono::month& m,
+                                 const chrono::weekday_indexed& wdi) noexcept;
+    constexpr year_month_weekday(const sys_days& dp) noexcept;
+    explicit constexpr year_month_weekday(const local_days& dp) noexcept;
+
+    constexpr year_month_weekday& operator+=(const months& m) noexcept;
+    constexpr year_month_weekday& operator-=(const months& m) noexcept;
+    constexpr year_month_weekday& operator+=(const years& y)  noexcept;
+    constexpr year_month_weekday& operator-=(const years& y)  noexcept;
+
+    constexpr chrono::year            year()            const noexcept;
+    constexpr chrono::month           month()           const noexcept;
+    constexpr chrono::weekday         weekday()         const noexcept;
+    constexpr unsigned                index()           const noexcept;
+    constexpr chrono::weekday_indexed weekday_indexed() const noexcept;
+
+    constexpr          operator sys_days()   const noexcept;
+    explicit constexpr operator local_days() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{year_month_weekday} represents a specific year, month,
+and n$^\textrm{th}$ weekday of the month.
+\tcode{year_month_weekday} is a field-based time point with a resolution of \tcode{days}.
+\begin{note}
+\tcode{year_month_weekday} supports \tcode{years}- and \tcode{months}-oriented arithmetic,
+but not \tcode{days}-oriented arithmetic.
+For the latter, there is a conversion to \tcode{sys_days},
+which efficiently supports \tcode{days}-oriented arithmetic.
+\end{note}
+\tcode{year_month_weekday} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable}).
+
+\pnum
+\tcode{year_month_weekday} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{year_month_weekday}!constructor}%
+\begin{itemdecl}
+constexpr year_month_weekday(const chrono::year& y, const chrono::month& m,
+                             const chrono::weekday_indexed& wdi) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_weekday} by
+initializing \tcode{y_} with \tcode{y}, \tcode{m_} with \tcode{m}, and \tcode{wdi_} with \tcode{wdi}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{year_month_weekday}!constructor}%
+\begin{itemdecl}
+constexpr year_month_weekday(const sys_days& dp) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_weekday}
+which corresponds to the date represented by \tcode{dp}.
+
+\pnum
+\remarks
+For any value \tcode{ymdl} of type \tcode{year_month_weekday}
+for which \tcode{ymdl.ok()} is \tcode{true},
+\tcode{ymdl == year_month_weekday\{sys_days\{ymdl\}\}} is \tcode{true}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{year_month_weekday}!constructor}%
+\begin{itemdecl}
+explicit constexpr year_month_weekday(const local_days& dp) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_weekday}
+that corresponds to the date represented by \tcode{dp}.
+
+\pnum
+\remarks
+Equivalent to constructing with \tcode{sys_days\{dp.time_since_epoch()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday& operator+=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday& operator-=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday& operator+=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday& operator-=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{year}{year_month_weekday}%
+\begin{itemdecl}
+constexpr chrono::year year() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{year_month_weekday}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday}{year_month_weekday}%
+\begin{itemdecl}
+constexpr chrono::weekday weekday() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wdi_.weekday()}.
+\end{itemdescr}
+
+\indexlibrarymember{index}{year_month_weekday}%
+\begin{itemdecl}
+constexpr unsigned index() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wdi_.index()}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday_indexed}{year_month_weekday}%
+\begin{itemdecl}
+constexpr chrono::weekday_indexed weekday_indexed() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wdi_}.
+\end{itemdescr}
+
+\indexlibrarymember{operator sys_days}{year_month_weekday}%
+\begin{itemdecl}
+constexpr operator sys_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{y_.ok() \&\& m_.ok() \&\& wdi_.weekday().ok()},
+returns a \tcode{sys_days} that
+represents the date \tcode{(index() - 1) * 7} days after
+the first \tcode{weekday()} of \tcode{year()/month()}.
+If \tcode{index()} is 0
+the returned \tcode{sys_days}
+represents the date 7 days prior to
+the first \tcode{weekday()} of \tcode{year()/month()}.
+Otherwise the returned value is unspecified.
+\end{itemdescr}
+
+\indexlibrarymember{operator local_days}{year_month_weekday}%
+\begin{itemdecl}
+explicit constexpr operator local_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{local_days\{sys_days\{*this\}.time_since_epoch()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{year_month_weekday}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If any of
+\tcode{y_.ok()},
+\tcode{m_.ok()}, or
+\tcode{wdi_.ok()}
+is \tcode{false}, returns \tcode{false}.
+Otherwise, if \tcode{*this} represents a valid date,
+returns \tcode{true}.
+Otherwise, returns \tcode{false}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{year_month_weekday}%
+\begin{itemdecl}
+constexpr bool operator==(const year_month_weekday& x, const year_month_weekday& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+x.year() == y.year() && x.month() == y.month() && x.weekday_indexed() == y.weekday_indexed()
+\end{codeblock}
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday operator+(const year_month_weekday& ymwd, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{(ymwd.year() / ymwd.month() + dm) / ymwd.weekday_indexed()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday operator+(const months& dm, const year_month_weekday& ymwd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwd + dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday operator-(const year_month_weekday& ymwd, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwd + (-dm)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday operator+(const year_month_weekday& ymwd, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{ymwd.year()+dy, ymwd.month(), ymwd.weekday_indexed()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday operator+(const years& dy, const year_month_weekday& ymwd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwd + dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_weekday}%
+\begin{itemdecl}
+constexpr year_month_weekday operator-(const year_month_weekday& ymwd, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwd + (-dm)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{year_month_weekday}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const year_month_weekday& ymwd);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << ymwdi.year() << '/' << ymwdi.month() << '/' << ymwdi.weekday_indexed()}.
+\end{itemdescr}
+
+\rSec3[time.calendar.year.month.weekday.last]{Class \tcode{year_month_weekday_last}}
+\indexlibrary{\idxcode{year_month_weekday_last}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class year_month_weekday_last {
+    chrono::year         y_;    // \expos
+    chrono::month        m_;    // \expos
+    chrono::weekday_last wdl_;  // \expos
+
+  public:
+    constexpr year_month_weekday_last(const chrono::year& y, const chrono::month& m,
+                                      const chrono::weekday_last& wdl) noexcept;
+
+    constexpr year_month_weekday_last& operator+=(const months& m) noexcept;
+    constexpr year_month_weekday_last& operator-=(const months& m) noexcept;
+    constexpr year_month_weekday_last& operator+=(const years& y)  noexcept;
+    constexpr year_month_weekday_last& operator-=(const years& y)  noexcept;
+
+    constexpr chrono::year         year()         const noexcept;
+    constexpr chrono::month        month()        const noexcept;
+    constexpr chrono::weekday      weekday()      const noexcept;
+    constexpr chrono::weekday_last weekday_last() const noexcept;
+
+    constexpr          operator sys_days()   const noexcept;
+    explicit constexpr operator local_days() const noexcept;
+    constexpr bool ok() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{year_month_weekday_last} represents a specific year, month,
+and last weekday of the month.
+\tcode{year_month_weekday_last} is a field-based time point with a resolution of \tcode{days},
+except that it is restricted to pointing to the last weekday of a year and month.
+\begin{note}
+\tcode{year_month_weekday_last} supports \tcode{years}- and \tcode{months}-oriented arithmetic,
+but not \tcode{days}-oriented arithmetic.
+For the latter, there is a conversion to \tcode{sys_days},
+which efficiently supports \tcode{days}-oriented arithmetic.
+\end{note}
+\tcode{year_month_weekday_last} is \tcode{EqualityComparable} (Table~\ref{tab:equalitycomparable}).
+
+\pnum
+\tcode{year_month_weekday_last} is a trivially copyable and standard-layout class type.
+
+\indexlibrary{\idxcode{year_month_weekday_last}!constructor}%
+\begin{itemdecl}
+constexpr year_month_weekday_last(const chrono::year& y, const chrono::month& m,
+                                  const chrono::weekday_last& wdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{year_month_weekday_last} by
+initializing \tcode{y_} with \tcode{y}, \tcode{m_} with \tcode{m}, and \tcode{wdl_} with \tcode{wdl}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last& operator+=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last& operator-=(const months& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - m}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+=}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last& operator+=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this + y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-=}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last& operator-=(const years& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects \tcode{*this = *this - y}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{year}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr chrono::year year() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_}.
+\end{itemdescr}
+
+\indexlibrarymember{month}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr chrono::month month() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m_}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr chrono::weekday weekday() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wdl_.weekday()}.
+\end{itemdescr}
+
+\indexlibrarymember{weekday_last}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr chrono::weekday_last weekday_last() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{wdl_}.
+\end{itemdescr}
+
+\indexlibrarymember{operator sys_days}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr operator sys_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If \tcode{ok() == true},
+returns a \tcode{sys_days} that represents
+the last \tcode{weekday()} of \tcode{year()/month()}.
+Otherwise the returned value is unspecified.
+\end{itemdescr}
+
+\indexlibrarymember{operator local_days}{year_month_weekday_last}%
+\begin{itemdecl}
+explicit constexpr operator local_days() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{local_days\{sys_days\{*this\}.time_since_epoch()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{ok}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr bool ok() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y_.ok() \&\& m_.ok() \&\& wdl_.ok()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr bool operator==(const year_month_weekday_last& x,
+                          const year_month_weekday_last& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+\begin{codeblock}
+x.year() == y.year() && x.month() == y.month() && x.weekday_last() == y.weekday_last()
+\end{codeblock}
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator+(const year_month_weekday_last& ymwdl, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{(ymwdl.year() / ymwdl.month() + dm) / ymwdl.weekday_last()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator+(const months& dm, const year_month_weekday_last& ymwdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwdl + dm}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator-(const year_month_weekday_last& ymwdl, const months& dm) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwdl + (-dm)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator+(const year_month_weekday_last& ymwdl, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{ymwdl.year()+dy, ymwdl.month(), ymwdl.weekday_last()\}}.
+\end{itemdescr}
+
+\indexlibrarymember{operator+}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator+(const years& dy, const year_month_weekday_last& ymwdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwdl + dy}.
+\end{itemdescr}
+
+\indexlibrarymember{operator-}{year_month_weekday_last}%
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator-(const year_month_weekday_last& ymwdl, const years& dy) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ymwdl + (-dy)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{year_month_weekday_last}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const year_month_weekday_last& ymwdl);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{os << ymwdl.year() << '/' << ymwdl.month() << '/' << ymwdl.weekday_last()}.
+\end{itemdescr}
+
+\rSec3[time.calendar.operators]{Conventional syntax operators}
+\indexlibrary{\idxcode{operator/}!calendar types|(}
+
+\pnum
+A set of overloaded \tcode{operator/} functions provides
+a conventional syntax for the creation of civil calendar dates.
+
+\pnum
+\begin{note}
+The year, month, and day are accepted in any of the following 3 orders:
+
+\begin{codeblock}
+@\tcode{\placeholder{year}}@/@\tcode{\placeholder{month}}@/@\tcode{\placeholder{day}}@
+@\tcode{\placeholder{month}}@/@\tcode{\placeholder{day}}@/@\tcode{\placeholder{year}}@
+@\tcode{\placeholder{day}}@/@\tcode{\placeholder{month}}@/@\tcode{\placeholder{year}}@
+\end{codeblock}
+
+Anywhere a \tcode{\placeholder{day}} is required, any of the following can also be specified:
+
+\begin{codeblock}
+last
+@\tcode{\placeholder{weekday}}@[@\tcode{\placeholder{i}}@]
+@\tcode{\placeholder{weekday}}@[last]
+\end{codeblock}
+\end{note}
+
+\pnum
+\begin{note}
+Partial-date types such as \tcode{year_month} and \tcode{month_day}
+can be created by not applying the second division operator
+for any of the three orders. For example:
+
+\begin{codeblock}
+year_month ym = 2015y/April;
+month_day md1 = April/4;
+month_day md2 = 4d/April;
+\end{codeblock}
+\end{note}
+
+\pnum
+\begin{example}
+\begin{codeblock}
+auto a = 2015/4/4;         // \tcode{a == int(125)}
+auto b = 2015y/4/4;        // \tcode{b == year_month_day\{year(2015), month(4), day(4)\}}
+auto c = 2015y/4d/April;   // error: no viable \tcode{operator/} for first \tcode{/}
+auto d = 2015/April/4;     // error: no viable \tcode{operator/} for first \tcode{/}
+\end{codeblock}
+\end{example}
+
+\begin{itemdecl}
+constexpr year_month
+  operator/(const year& y, const month& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{y, m\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month
+  operator/(const year& y, int   m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y / month(m)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day
+  operator/(const month& m, const day& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{m, d\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day
+  operator/(const month& m, int d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m / day(d)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day
+  operator/(int m, const day& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / d}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day
+  operator/(const day& d, const month& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m / d}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day
+  operator/(const day& d, int m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / d}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day_last
+  operator/(const month& m, last_spec) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month_day_last\{m\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day_last
+  operator/(int m, last_spec) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / last}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day_last
+  operator/(last_spec, const month& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m / last}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_day_last
+  operator/(last_spec, int m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / last}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday
+  operator/(const month& m, const weekday_indexed& wdi) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{m, wdi\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday
+  operator/(int m, const weekday_indexed& wdi) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / wdi}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday
+  operator/(const weekday_indexed& wdi, const month& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m / wdi}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday
+  operator/(const weekday_indexed& wdi, int m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / wdi}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday_last
+  operator/(const month& m, const weekday_last& wdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{m, wdl\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday_last
+  operator/(int m, const weekday_last& wdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / wdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday_last
+  operator/(const weekday_last& wdl, const month& m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{m / wdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr month_weekday_last
+  operator/(const weekday_last& wdl, int m) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{month(m) / wdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day
+  operator/(const year_month& ym, const day& d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{ym.year(), ym.month(), d\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day
+  operator/(const year_month& ym, int d) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{ym / day(d)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day
+  operator/(const year& y, const month_day& md) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y / md.month() / md.day()}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day
+  operator/(int y, const month_day& md) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / md}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day
+  operator/(const month_day& md, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y / md}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day
+  operator/(const month_day& md, int y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / md}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator/(const year_month& ym, last_spec) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{ym.year(), month_day_last\{ym.month()\}\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator/(const year& y, const month_day_last& mdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{y, mdl\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator/(int y, const month_day_last& mdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / mdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator/(const month_day_last& mdl, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y / mdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_day_last
+  operator/(const month_day_last& mdl, int y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / mdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday
+  operator/(const year_month& ym, const weekday_indexed& wdi) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{ym.year(), ym.month(), wdi\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday
+  operator/(const year& y, const month_weekday& mwd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{y, mwd.month(), mwd.weekday_indexed()\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday
+  operator/(int y, const month_weekday& mwd) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / mwd}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday
+  operator/(const month_weekday& mwd, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y / mwd}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday
+  operator/(const month_weekday& mwd, int y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / mwd}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator/(const year_month& ym, const weekday_last& wdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{ym.year(), ym.month(), wdl\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator/(const year& y, const month_weekday_last& mwdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{\{y, mwdl.month(), mwdl.weekday_last()\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator/(int y, const month_weekday_last& mwdl) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / mwdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator/(const month_weekday_last& mwdl, const year& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y / mwdl}.
+\end{itemdescr}
+
+\begin{itemdecl}
+constexpr year_month_weekday_last
+  operator/(const month_weekday_last& mwdl, int y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{year(y) / mwdl}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{operator/}!calendar types|)}
+
 \rSec2[time.format]{Formatting}
 
 \pnum
-Each \tcode{format} overload specified in this section
+Each \tcode{format} overload specified in this subclause
 calls \tcode{to_stream} unqualified,
 so as to enable argument dependent lookup\iref{basic.lookup.argdep}.
 
 \indexlibrary{\idxcode{format}|(}%
 \begin{itemdecl}
-template <class charT, class Streamable>
+template<class charT, class Streamable>
   basic_string<charT>
     format(const charT* fmt, const Streamable& s);
 \end{itemdecl}
@@ -21362,7 +25391,7 @@ Then calls \tcode{to_stream(os, fmt, s)}.
 \end{itemdescr}
 
 \begin{itemdecl}
-template <class charT, class Streamable>
+template<class charT, class Streamable>
   basic_string<charT>
     format(const locale& loc, const charT* fmt, const Streamable& s);
 \end{itemdecl}
@@ -21390,7 +25419,7 @@ Then calls \tcode{to_stream(os, fmt, s)}.
 \end{itemdescr}
 
 \begin{itemdecl}
-template <class charT, class traits, class Alloc, class Streamable>
+template<class charT, class traits, class Alloc, class Streamable>
   basic_string<charT, traits, Alloc>
     format(const basic_string<charT, traits, Alloc>& fmt, const Streamable& s);
 \end{itemdecl}
@@ -21418,7 +25447,7 @@ Then calls \tcode{to_stream(os, fmt.c_str(), s)}.
 
 \indexlibrarymember{}{}%
 \begin{itemdecl}
-template <class charT, class traits, class Alloc, class Streamable>
+template<class charT, class traits, class Alloc, class Streamable>
   basic_string<charT, traits, Alloc>
     format(const locale& loc, const basic_string<charT, traits, Alloc>& fmt, const Streamable& s);
 \end{itemdecl}
@@ -21698,12 +25727,12 @@ A \tcode{\%} character.
 \indexlibrary{\idxcode{parse}|(}%
 
 \pnum
-Each \tcode{parse} overload specified in this section
+Each \tcode{parse} overload specified in this subclause
 calls \tcode{from_stream} unqualified,
 so as to enable argument dependent lookup\iref{basic.lookup.argdep}.
 
 \begin{itemdecl}
-template <class charT, class traits, class Alloc, class Parsable>
+template<class charT, class traits, class Alloc, class Parsable>
   @\unspec@
     parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp);
 \end{itemdecl}
@@ -21725,7 +25754,7 @@ calls \tcode{from_stream(is, fmt.c_str(), tp)}.
 \end{itemdescr}
 
 \begin{itemdecl}
-template <class charT, class traits, class Alloc, class Parsable>
+template<class charT, class traits, class Alloc, class Parsable>
   @\unspec@
     parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp,
           basic_string<charT, traits, Alloc>& abbrev);
@@ -21748,7 +25777,7 @@ calls \tcode{from_stream(is, fmt.c_str(), tp, \&abbrev)}.
 \end{itemdescr}
 
 \begin{itemdecl}
-template <class charT, class traits, class Alloc, class Parsable>
+template<class charT, class traits, class Alloc, class Parsable>
   @\unspec@
     parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp,
           minutes& offset);
@@ -21771,7 +25800,7 @@ calls \tcode{from_stream(is, fmt.c_str(), tp, nullptr, \&offset)}.
 \end{itemdescr}
 
 \begin{itemdecl}
-template <class charT, class traits, class Alloc, class Parsable>
+template<class charT, class traits, class Alloc, class Parsable>
   @\unspec@
     parse(const basic_string<charT, traits, Alloc>& fmt, Parsable& tp,
           basic_string<charT, traits, Alloc>& abbrev, minutes& offset);
