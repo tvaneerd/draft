@@ -25473,6 +25473,715 @@ constexpr year_month_weekday_last
 
 \indexlibrary{\idxcode{operator/}!calendar types|)}
 
+\rSec2[time.tod]{Class template \tcode{time_of_day}}
+
+\rSec3[time.tod.overview]{Overview}
+\indexlibrary{\idxcode{time_of_day}}
+
+\begin{codeblock}
+namespace std::chrono {
+  template<class Duration> class time_of_day;
+
+  template<> class time_of_day<hours>;
+  template<> class time_of_day<minutes>;
+  template<> class time_of_day<seconds>;
+  template<class Rep, class Period> class time_of_day<duration<Rep, Period>>;
+}
+\end{codeblock}
+
+\pnum
+The \tcode{time_of_day} class template
+splits a \tcode{duration} representing the time elapsed since midnight
+into a ``broken down'' time of day such as
+$hours$:$minutes$:$seconds$.
+The \tcode{Duration} template parameter dictates
+the precision to which the time is broken down.
+\begin{note}
+This can vary from a coarse precision of hours
+to a very fine precision of nanoseconds.
+\end{note}
+A \tcode{time_of_day} object also tracks
+whether it should be output
+as a 12-hour time format or a 24-hour time format.
+
+\pnum
+The primary \tcode{time_of_day} template is not defined.
+Four specializations are provided to handle four different
+levels of precision.
+
+\pnum
+Each specialization of \tcode{time_of_day} is a trivially copyable
+and standard-layout class type.
+
+\rSec3[time.tod.hours]{Hours precision}
+\indexlibrary{\idxcode{time_of_day<hours>}}
+
+\begin{codeblock}
+namespace std::chrono {
+  template<>
+  class time_of_day<hours> {
+  public:
+    using precision = chrono::hours;
+
+    time_of_day() = default;
+    explicit constexpr time_of_day(chrono::hours since_midnight) noexcept;
+
+    constexpr chrono::hours hours() const noexcept;
+
+    explicit constexpr operator  precision()   const noexcept;
+    constexpr          precision to_duration() const noexcept;
+
+    constexpr void make24() noexcept;
+    constexpr void make12() noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\begin{note}
+This specialization handles hours since midnight.
+\end{note}
+
+\indexlibrary{\idxcode{time_of_day<hours>}!constructor}%
+\begin{itemdecl}
+explicit constexpr time_of_day(chrono::hours since_midnight) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{time_of_day} in 24-hour format
+corresponding to \tcode{since_midnight} hours after 00:00:00.
+
+\pnum
+\postconditions
+\tcode{hours()} returns the integral number of hours \tcode{since_midnight} is after 00:00:00.
+\end{itemdescr}
+
+\indexlibrarymember{hours}{time_of_day<hours>}%
+\begin{itemdecl}
+constexpr chrono::hours hours() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The stored hour of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator precision}{time_of_day<hours>}%
+\begin{itemdecl}
+explicit constexpr operator precision() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The number of hours since midnight.
+\end{itemdescr}
+
+\indexlibrarymember{to_duration}{time_of_day<hours>}%
+\begin{itemdecl}
+constexpr precision to_duration() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{precision\{*this\}}.
+\end{itemdescr}
+
+\indexlibrarymember{make24}{time_of_day<hours>}%
+\begin{itemdecl}
+constexpr void make24() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 12-hour time,
+converts to a 24-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\indexlibrarymember{make12}{time_of_day<hours>}%
+\begin{itemdecl}
+constexpr void make12() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 24-hour time,
+converts to a 12-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\rSec3[time.tod.minutes]{Minutes precision}
+\indexlibrary{\idxcode{time_of_day<minutes>}}
+
+\begin{codeblock}
+namespace std::chrono {
+  template<>
+  class time_of_day<minutes> {
+  public:
+    using precision = chrono::minutes;
+
+    time_of_day() = default;
+    explicit constexpr time_of_day(chrono::minutes since_midnight) noexcept;
+
+    constexpr chrono::hours    hours()   const noexcept;
+    constexpr chrono::minutes  minutes() const noexcept;
+
+    explicit constexpr operator precision()    const noexcept;
+    constexpr          precision to_duration() const noexcept;
+
+    constexpr void make24() noexcept;
+    constexpr void make12() noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\begin{note}
+This specialization handles hours and minutes since midnight.
+\end{note}
+
+\indexlibrary{\idxcode{time_of_day<minutes>}!constructor}%
+\begin{itemdecl}
+explicit constexpr time_of_day(minutes since_midnight) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{time_of_day}
+in 24-hour format
+corresponding to \tcode{since_midnight} minutes after 00:00:00.
+
+\pnum
+\postconditions
+\tcode{hours()} returns the integral number of hours
+\tcode{since_midnight} is after 00:00:00.
+\tcode{minutes()} returns the integral number of minutes
+\tcode{since_midnight} is after \tcode{(\textrm{00:00:00} + hours())}.
+\end{itemdescr}
+
+\indexlibrarymember{hours}{time_of_day<minutes>}%
+\begin{itemdecl}
+constexpr chrono::hours hours() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The stored hour of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{minutes}{time_of_day<minutes>}%
+\begin{itemdecl}
+constexpr chrono::minutes minutes() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The stored minute of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator precision}{time_of_day<minutes>}%
+\begin{itemdecl}
+explicit constexpr operator precision() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The number of minutes since midnight.
+\end{itemdescr}
+
+\indexlibrarymember{to_duration}{time_of_day<minutes>}%
+\begin{itemdecl}
+constexpr precision to_duration() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{precision\{*this\}}.
+\end{itemdescr}
+
+\indexlibrarymember{make24}{time_of_day<minutes>}%
+\begin{itemdecl}
+constexpr void make24() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 12-hour time,
+converts to a 24-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\indexlibrarymember{make12}{time_of_day<minutes>}%
+\begin{itemdecl}
+constexpr void make12() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 24-hour time,
+converts to a 12-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\rSec3[time.tod.seconds]{Seconds precision}
+\indexlibrary{\idxcode{time_of_day<seconds>}}
+
+\begin{codeblock}
+namespace std::chrono {
+  template<>
+  class time_of_day<seconds> {
+  public:
+    using precision = chrono::seconds;
+
+    time_of_day() = default;
+    explicit constexpr time_of_day(chrono::seconds since_midnight) noexcept;
+
+    constexpr chrono::hours   hours()   const noexcept;
+    constexpr chrono::minutes minutes() const noexcept;
+    constexpr chrono::seconds seconds() const noexcept;
+
+    explicit constexpr operator  precision()   const noexcept;
+    constexpr          precision to_duration() const noexcept;
+
+    constexpr void make24() noexcept;
+    constexpr void make12() noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+\begin{note}
+This specialization handles hours, minutes, and seconds since midnight.
+\end{note}
+
+\indexlibrary{\idxcode{time_of_day<seconds>}!constructor}%
+\begin{itemdecl}
+explicit constexpr time_of_day(seconds since_midnight) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{time_of_day}
+in 24-hour format
+corresponding to \tcode{since_midnight} seconds after 00:00:00.
+
+\pnum
+\postconditions
+\tcode{hours()} returns the integral number of hours
+\tcode{since_midnight} is after 00:00:00.
+\tcode{minutes()} returns the integral number of minutes
+\tcode{since_midnight} is after \tcode{(\textrm{00:00:00} + hours())}.
+\tcode{seconds()} returns the integral number of seconds
+\tcode{since_midnight} is after \tcode{(\textrm{00:00:00} + hours() + minutes())}.
+\end{itemdescr}
+
+\indexlibrarymember{hours}{time_of_day<seconds>}%
+\begin{itemdecl}
+constexpr chrono::hours hours() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The stored hour of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{minutes}{time_of_day<seconds>}%
+\begin{itemdecl}
+constexpr chrono::minutes minutes() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The stored minute of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{seconds}{time_of_day<seconds>}%
+\begin{itemdecl}
+constexpr chrono::seconds seconds() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The stored second of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator precision}{time_of_day<seconds>}%
+\begin{itemdecl}
+explicit constexpr operator precision() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The number of seconds since midnight.
+\end{itemdescr}
+
+\indexlibrarymember{to_duration}{time_of_day<seconds>}%
+\begin{itemdecl}
+constexpr precision to_duration() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{precision\{*this\}}.
+\end{itemdescr}
+
+\indexlibrarymember{make24}{time_of_day<seconds>}%
+\begin{itemdecl}
+constexpr void make24() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 12-hour time,
+converts to a 24-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\indexlibrarymember{make12}{time_of_day<seconds>}%
+\begin{itemdecl}
+constexpr void make12() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 24-hour time,
+converts to a 12-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\rSec3[time.tod.subsecond]{Sub-second precision}
+\indexlibrary{\idxcode{time_of_day<\placeholder{sub-second duration}>}}
+
+\begin{codeblock}
+namespace std::chrono {
+  template<class Rep, class Period>
+  class time_of_day<duration<Rep, Period>> {
+  public:
+    using precision = duration<Rep, Period>;
+
+    time_of_day() = default;
+    explicit constexpr time_of_day(precision since_midnight) noexcept;
+
+    constexpr chrono::hours     hours()      const noexcept;
+    constexpr chrono::minutes   minutes()    const noexcept;
+    constexpr chrono::seconds   seconds()    const noexcept;
+    constexpr precision subseconds() const noexcept;
+
+    explicit constexpr operator  precision()   const noexcept;
+    constexpr          precision to_duration() const noexcept;
+
+    constexpr void make24() noexcept;
+    constexpr void make12() noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+This specialization shall not exist unless
+\tcode{treat_as_floating_point_v<Rep>} is \tcode{false}
+and
+\tcode{duration<Rep, Period>} is not convertible to \tcode{seconds}.
+\begin{note}
+This specialization handles hours, minutes, seconds, and fractional seconds since midnight.
+Typical uses are with \tcode{milliseconds}, \tcode{microseconds} and \tcode{nanoseconds}.
+\end{note}
+
+\indexlibrary{\idxcode{time_of_day<\placeholder{sub-second duration}>}!constructor}%
+\begin{itemdecl}
+explicit constexpr time_of_day(precision since_midnight) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Constructs an object of type \tcode{time_of_day}
+in 24-hour format
+corresponding to \tcode{since_midnight} fractional seconds after 00:00:00.
+
+\pnum
+\postconditions
+\tcode{hours()} returns the integral number of hours
+\tcode{since_midnight} is after 00:00:00.
+\tcode{minutes()} returns the integral number of minutes
+\tcode{since_midnight }is after \tcode{(\textrm{00:00:00} + hours())}.
+\tcode{seconds()} returns the integral number of seconds
+\tcode{since_midnight }is after \tcode{(\textrm{00:00:00} + hours() + minutes())}.
+\tcode{subseconds()} returns the integral number of fractional seconds
+\tcode{since_midnight} is after \tcode{(\textrm{00:00:00} + hours() + minutes() + seconds())}.
+\end{itemdescr}
+
+\indexlibrarymember{hours}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+constexpr chrono::hours hours() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The stored hour of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{minutes}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+constexpr chrono::minutes minutes() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The stored minute of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{seconds}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+constexpr chrono::seconds seconds() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The stored second of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{subseconds}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+constexpr duration<Rep, Period> subseconds() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The stored subsecond of \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator precision}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+explicit constexpr operator precision() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The number of subseconds since midnight.
+\end{itemdescr}
+
+\indexlibrarymember{to_duration}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+constexpr precision to_duration() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{precision\{*this\}}.
+\end{itemdescr}
+
+\indexlibrarymember{make24}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+constexpr void make24() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 12-hour time,
+converts to a 24-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\indexlibrarymember{make12}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+constexpr void make12() noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{*this} is a 24-hour time,
+converts to a 12-hour time.
+Otherwise, no effects.
+\end{itemdescr}
+
+\rSec3[time.tod.io]{Formatted output}
+
+\indexlibrarymember{operator<<}{time_of_day<hours>}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const time_of_day<hours>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{t} is a 24-hour time,
+outputs to \tcode{os} according to the format
+\tcode{"\%H00"}\iref{time.format}.
+Otherwise
+outputs to \tcode{os} according to the format
+\tcode{"\%I\%p"}\iref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+for (hours h : {1h, 18h}) {
+  time_of_day<hours> tod(h);
+  os << tod << '\n';
+  tod.make12()
+  os << tod << '\n';
+}
+\end{codeblock}
+
+Produces the output:
+
+\begin{codeblock}
+0100
+1am
+1800
+6pm
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{time_of_day<minutes>}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const time_of_day<minutes>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{t} is a 24-hour time,
+outputs to \tcode{os} according to the format
+\tcode{"\%H:\%M"}\iref{time.format}.
+Otherwise
+outputs to \tcode{os} according to the format
+\tcode{"\%I:\%M\%p"}\iref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+
+\begin{example}
+\begin{codeblock}
+for (minutes m : {68min, 1095min}) {
+  time_of_day<minutes> tod(m);
+  os << tod << '\n';
+  tod.make12()
+  os << tod << '\n';
+}
+\end{codeblock}
+
+Produces the output:
+
+\begin{codeblock}
+01:08
+1:08am
+18:15
+6:15pm
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{time_of_day<seconds>}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const time_of_day<seconds>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{t} is a 24-hour time,
+outputs to \tcode{os} according to the format
+\tcode{"\%T"}\iref{time.format}.
+Otherwise
+outputs to \tcode{os} according to the format
+\tcode{"\%I:\%M:\%S\%p"}\iref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+
+\begin{example}
+\begin{codeblock}
+for (seconds s : {4083s, 65745s}) {
+  time_of_day<seconds> tod(s);
+  os << tod << '\n';
+  tod.make12()
+  os << tod << '\n';
+}
+\end{codeblock}
+
+Produces the output:
+
+\begin{codeblock}
+01:08:03
+1:08:03am
+18:15:45
+6:15:45pm
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{time_of_day<\placeholder{sub-second duration}>}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const time_of_day<duration<Rep, Period>>& t);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If \tcode{t} is a 24-hour time,
+outputs to \tcode{os} according to the format
+\tcode{"\%T"}\iref{time.format}.
+Otherwise
+outputs to \tcode{os} according to the format
+\tcode{"\%I:\%M:\%S\%p"}\iref{time.format}.
+
+\pnum
+\returns \tcode{os}.
+
+\begin{example}
+\begin{codeblock}
+for (milliseconds ms : {4083007ms, 65745123ms}) {
+  time_of_day<seconds> tod(ms);
+  os << tod << '\n';
+  tod.make12()
+  os << tod << '\n';
+}
+\end{codeblock}
+
+Produces the output:
+
+\begin{codeblock}
+01:08:03.007
+1:08:03.007am
+18:15:45.123
+6:15:45.123pm
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
 \rSec2[time.format]{Formatting}
 
 \pnum
