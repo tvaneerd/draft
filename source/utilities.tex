@@ -26202,7 +26202,7 @@ and to user-defined calendars.
 
 \rSec3[time.zone.db]{Time zone database}
 
-\rSec4[time.zone.tzdb]{Class \tcode{tzdb}}
+\rSec4[time.zone.db.tzdb]{Class \tcode{tzdb}}
 \indexlibrary{\idxcode{tzdb}}
 
 \begin{codeblock}
@@ -26263,7 +26263,7 @@ const time_zone* current_zone() const;
 A pointer to the time zone which the computer has set as its local time zone.
 \end{itemdescr}
 
-\rSec4[time.zone.tzdb.list]{Class \tcode{tzdb_list}}
+\rSec4[time.zone.db.list]{Class \tcode{tzdb_list}}
 \indexlibrary{\idxcode{tzdb_list}}
 
 \begin{codeblock}
@@ -26404,7 +26404,7 @@ const_iterator cend() const noexcept;
 \returns \tcode{end()}.
 \end{itemdescr}
 
-\rSec4[time.zone.tzdb.access]{Time zone database access}
+\rSec4[time.zone.db.access]{Time zone database access}
 
 \indexlibrary{\idxcode{get_tzdb_list}}%
 \begin{itemdecl}
@@ -27567,6 +27567,320 @@ Then calls \tcode{to_stream(os, fmt, tp.get_local_time(), \&info.abbrev, \&info.
 
 \pnum
 \returns \tcode{os}.
+\end{itemdescr}
+
+\rSec3[time.zone.leap]{Class \tcode{leap}}
+
+\rSec4[time.zone.leap.overview]{Overview}
+\indexlibrary{\idxcode{leap}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class leap {
+  public:
+    leap(const leap&)            = default;
+    leap& operator=(const leap&) = default;
+
+    // unspecified additional constructors
+
+    constexpr sys_seconds date() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+Objects of type \tcode{leap} representing
+the date of the leap second insertions
+are constructed and stored in the time zone database when initialized.
+
+\pnum
+\begin{example}
+\begin{codeblock}
+for (auto& l : get_tzdb().leaps)
+  if (l <= 2018y/March/17d)
+    cout << l.date() << '\n';
+\end{codeblock}
+
+Produces the output:
+
+\begin{codeblock}
+1972-07-01 00:00:00
+1973-01-01 00:00:00
+1974-01-01 00:00:00
+1975-01-01 00:00:00
+1976-01-01 00:00:00
+1977-01-01 00:00:00
+1978-01-01 00:00:00
+1979-01-01 00:00:00
+1980-01-01 00:00:00
+1981-07-01 00:00:00
+1982-07-01 00:00:00
+1983-07-01 00:00:00
+1985-07-01 00:00:00
+1988-01-01 00:00:00
+1990-01-01 00:00:00
+1991-01-01 00:00:00
+1992-07-01 00:00:00
+1993-07-01 00:00:00
+1994-07-01 00:00:00
+1996-01-01 00:00:00
+1997-07-01 00:00:00
+1999-01-01 00:00:00
+2006-01-01 00:00:00
+2009-01-01 00:00:00
+2012-07-01 00:00:00
+2015-07-01 00:00:00
+2017-01-01 00:00:00
+\end{codeblock}
+\end{example}
+
+\rSec4[time.zone.leap.members]{Member functions}
+
+\indexlibrarymember{date}{leap}%
+\begin{itemdecl}
+constexpr sys_seconds date() const noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The date and time at which the leap second was inserted.
+\end{itemdescr}
+
+\rSec4[time.zone.leap.nonmembers]{Non-member functions}
+
+\indexlibrarymember{operator==}{leap}%
+\begin{itemdecl}
+constexpr bool operator==(const leap& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.date() == y.date()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{leap}%
+\begin{itemdecl}
+constexpr bool operator<(const leap& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.date() < y.date()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{leap}%
+\indexlibrarymember{operator==}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator==(const leap& x, const sys_time<Duration>& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.date() == y}.
+\end{itemdescr}
+
+\indexlibrarymember{operator==}{leap}%
+\indexlibrarymember{operator==}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator==(const sys_time<Duration>& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y == x}.
+\end{itemdescr}
+
+\indexlibrarymember{operator"!=}{leap}%
+\indexlibrarymember{operator"!=}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator!=(const leap& x, const sys_time<Duration>& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{!(x == y)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator"!=}{leap}%
+\indexlibrarymember{operator"!=}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator!=(const sys_time<Duration>& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{!(x == y)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{leap}%
+\indexlibrarymember{operator<}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator<(const leap& x, const sys_time<Duration>& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.date() < y}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{leap}%
+\indexlibrarymember{operator<}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator<(const sys_time<Duration>& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x < y.date()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator>}{leap}%
+\indexlibrarymember{operator>}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator>(const leap& x, const sys_time<Duration>& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y < x}.
+\end{itemdescr}
+
+\indexlibrarymember{operator>}{leap}%
+\indexlibrarymember{operator>}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator>(const sys_time<Duration>& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{y < x}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<=}{leap}%
+\indexlibrarymember{operator<=}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator<=(const leap& x, const sys_time<Duration>& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{!(y < x)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<=}{leap}%
+\indexlibrarymember{operator<=}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator<=(const sys_time<Duration>& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{!(y < x)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator>=}{leap}%
+\indexlibrarymember{operator>=}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator>=(const leap& x, const sys_time<Duration>& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{!(x < y)}.
+\end{itemdescr}
+
+\indexlibrarymember{operator>=}{leap}%
+\indexlibrarymember{operator>=}{sys_time}%
+\begin{itemdecl}
+template<class Duration>
+  constexpr bool operator>=(const sys_time<Duration>& x, const leap& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{!(x < y)}.
+\end{itemdescr}
+
+\rSec3[time.zone.link]{Class \tcode{link}}
+
+\rSec4[time.zone.link.overview]{Overview}
+\indexlibrary{\idxcode{link}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class link {
+  public:
+    link(link&&)            = default;
+    link& operator=(link&&) = default;
+
+    // unspecified additional constructors
+
+    string_view name()   const noexcept;
+    string_view target() const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+A \tcode{link} specifies an alternative name for a \tcode{time_zone}.
+\tcode{link}s are constructed when the time zone database is initialized.
+
+\rSec4[time.zone.link.members]{Member functions}
+
+\indexlibrarymember{name}{link}%
+\begin{itemdecl}
+string_view name() const noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The alternative name for the time zone.
+\end{itemdescr}
+
+\indexlibrarymember{target}{link}%
+\begin{itemdecl}
+string_view target() const noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The name of the \tcode{time_zone} for which
+this \tcode{link} provides an alternative name.
+\end{itemdescr}
+
+\rSec4[time.zone.link.nonmembers]{Non-member functions}
+
+\indexlibrarymember{operator==}{link}%
+\begin{itemdecl}
+bool operator==(const link& x, const link& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.name() == y.name()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{link}%
+\begin{itemdecl}
+bool operator<(const link& x, const link& y) noexcept
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.name() < y.name()}.
 \end{itemdescr}
 
 \rSec2[time.format]{Formatting}
