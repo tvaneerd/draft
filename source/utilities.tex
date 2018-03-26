@@ -17486,6 +17486,9 @@ utilities.
 \indexlibrary{\idxcode{local_seconds}}%
 \indexlibrary{\idxcode{local_days}}%
 \indexlibrary{\idxcode{local_t}}%
+\indexlibrary{\idxcode{choose}}%
+\indexlibrarymember{earliest}{choose}%
+\indexlibrarymember{latest}{choose}%
 \begin{codeblock}
 namespace std {
   namespace chrono {
@@ -18246,12 +18249,13 @@ namespace std {
     struct tzdb;
     class tzdb_list;
 
+    // \ref{time.zone.db.access}, time zone database access
     const tzdb& get_tzdb();
     tzdb_list& get_tzdb_list();
     const time_zone* locate_zone(string_view tz_name);
     const time_zone* current_zone();
 
-    // \ref{time.zone.db.remote}, remote time zone database
+    // \ref{time.zone.db.remote}, remote time zone database support
     const tzdb& reload_tzdb();
     string remote_version();
 
@@ -18285,7 +18289,7 @@ namespace std {
     // \ref{time.zone.zonedtraits}, class template \tcode{zoned_traits}
     template<class T> struct zoned_traits;
 
-    // \ref{time.zone.zonedtime}, class \tcode{zoned_time}
+    // \ref{time.zone.zonedtime}, class template \tcode{zoned_time}
     template<class Duration, class TimeZonePtr = const time_zone*> class zoned_time;
 
     using zoned_seconds = zoned_time<seconds>;
@@ -19993,7 +19997,7 @@ namespace std::chrono {
 
     static time_point now() noexcept;
 
-    // map to C API
+    // mapping to/from C type \tcode{time_t}
     static time_t      to_time_t  (const time_point& t) noexcept;
     static time_point  from_time_t(time_t t) noexcept;
   };
@@ -24114,8 +24118,8 @@ that value will be assigned to \tcode{*offset} if \tcode{offset} is non-null.
 \begin{codeblock}
 namespace std::chrono {
   class year_month_day_last {
-    chrono::year           y_;          // exposition only
-    chrono::month_day_last mdl_;        // exposition only
+    chrono::year           y_;          // \expos
+    chrono::month_day_last mdl_;        // \expos
 
   public:
     constexpr year_month_day_last(const chrono::year& y,
@@ -24409,9 +24413,9 @@ template<class charT, class traits>
 \begin{codeblock}
 namespace std::chrono {
   class year_month_weekday {
-    chrono::year            y_;         // exposition only
-    chrono::month           m_;         // exposition only
-    chrono::weekday_indexed wdi_;       // exposition only
+    chrono::year            y_;         // \expos
+    chrono::month           m_;         // \expos
+    chrono::weekday_indexed wdi_;       // \expos
 
   public:
     year_month_weekday() = default;
@@ -26180,6 +26184,1389 @@ Produces the output:
 6:15:45.123pm
 \end{codeblock}
 \end{example}
+\end{itemdescr}
+
+\rSec2[time.zone]{Time zones}
+
+\rSec3[time.zone.general]{In general}
+
+\pnum
+\ref{time.zone} describes an interface for accessing
+the IANA Time Zone database%
+%%% FIXME: Move URL to normative references
+\footnote{RFC 6557 https://tools.ietf.org/html/rfc6557},
+that interoperates with \tcode{sys_time} and \tcode{local_time}.
+This interface provides time zone support to
+both the civil calendar types\iref{time.calendar}
+and to user-defined calendars.
+
+\rSec3[time.zone.db]{Time zone database}
+
+\rSec4[time.zone.tzdb]{Class \tcode{tzdb}}
+\indexlibrary{\idxcode{tzdb}}
+
+\begin{codeblock}
+namespace std::chrono {
+  struct tzdb {
+    string            version;
+    vector<time_zone> zones;
+    vector<link>      links;
+    vector<leap>      leaps;
+
+    const time_zone* locate_zone(string_view tz_name) const;
+    const time_zone* current_zone() const;
+  };
+}
+\end{codeblock}
+
+\pnum
+Each \tcode{vector} in a \tcode{tzdb} object
+is sorted to enable fast lookup.
+
+\indexlibrarymember{locate_zone}{tzdb}%
+\begin{itemdecl}
+const time_zone* locate_zone(string_view tz_name) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+If a \tcode{time_zone} is found
+for which \tcode{name() == tz_name},
+returns a pointer to that \tcode{time_zone}.
+Otherwise
+if a \tcode{link} is found
+for which \tcode{tz_name == link.name()},
+then a pointer is returned
+to the \tcode{time_zone} for which \tcode{zone.name() == link.target()}.
+\begin{note}
+A \tcode{link} specifies an alternative name for a \tcode{time_zone}.
+\end{note}
+
+\throws
+If a \tcode{const time_zone*} cannot be found
+as described in the \returns clause,
+throws a \tcode{runtime_error}.
+\begin{note}
+On non-exceptional return, the return value is always a pointer to a valid \tcode{time_zone}.
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{current_zone}{tzdb}%
+\begin{itemdecl}
+const time_zone* current_zone() const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A pointer to the time zone which the computer has set as its local time zone.
+\end{itemdescr}
+
+\rSec4[time.zone.tzdb.list]{Class \tcode{tzdb_list}}
+\indexlibrary{\idxcode{tzdb_list}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class tzdb_list {
+  public:
+    tzdb_list(const tzdb_list&) = delete;
+    tzdb_list& operator=(const tzdb_list&) = delete;
+
+    // unspecified additional constructors
+
+    class const_iterator;
+
+    const tzdb& front() const noexcept;
+
+    const_iterator erase_after(const_iterator p);
+
+    const_iterator begin() const noexcept;
+    const_iterator end()   const noexcept;
+
+    const_iterator cbegin() const noexcept;
+    const_iterator cend()   const noexcept;
+  };
+}
+\end{codeblock}
+
+\pnum
+The \tcode{tzdb_list} database is a singleton;
+the unique object of type \tcode{tzdb_list} can be
+accessed via the \tcode{get_tzdb_list()} function.
+\begin{note}
+This access is only needed for those applications
+that need to have long uptimes and
+have a need to update the time zone database while running.
+Other applications can implicitly access the \tcode{front()} of this list
+via the read-only namespace scope functions
+\tcode{get_tzdb()},
+\tcode{locate_zone()}, and
+\tcode{current_zone()}.
+\end{note}
+The \tcode{tzdb_list} object contains a list of \tcode{tzdb} objects.
+
+\pnum
+\tcode{tzdb_list::const_iterator} is a constant iterator
+which meets the forward iterator requirements
+and has a value type of \tcode{tzdb}.
+
+\indexlibrarymember{front}{tzdb_list}%
+\begin{itemdecl}
+const tzdb& front() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A reference to the first \tcode{tzdb} in the container.
+
+\pnum
+\remarks
+This operation is thread-safe with respect to \tcode{reload_tzdb()}.
+\begin{note}
+\tcode{reload_tzdb()} pushes a new \tcode{tzdb}
+onto the front of this container.
+\end{note}
+\end{itemdescr}
+
+\indexlibrarymember{erase_after}{tzdb_list}%
+\begin{itemdecl}
+const_iterator erase_after(const_iterator p);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\requires
+The iterator following \tcode{p} is dereferenceable.
+
+\pnum
+\effects
+Erases the \tcode{tzdb} referred to by the iterator following \tcode{p}.
+
+\pnum
+\returns
+An iterator pointing to the element following the one that was erased,
+or \tcode{end()} if no such element exists.
+
+\pnum
+\remarks
+No pointers, references, or iterators are invalidated
+except those referring to the erased \tcode{tzdb}.
+\begin{note}
+It is not possible to erase the \tcode{tzdb}
+referred to by \tcode{begin()}.
+\end{note}
+
+\pnum
+\throws Nothing.
+\end{itemdescr}
+
+\indexlibrarymember{begin}{tzdb_list}%
+\begin{itemdecl}
+const_iterator begin() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+An iterator referring to the first \tcode{tzdb} in the container.
+\end{itemdescr}
+
+\indexlibrarymember{end}{tzdb_list}%
+\begin{itemdecl}
+const_iterator end() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+An iterator referring to the position one past the last \tcode{tzdb} in the container.
+\end{itemdescr}
+
+\indexlibrarymember{cbegin}{tzdb_list}%
+\begin{itemdecl}
+const_iterator cbegin() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{begin()}.
+\end{itemdescr}
+
+\indexlibrarymember{cend}{tzdb_list}%
+\begin{itemdecl}
+const_iterator cend() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{end()}.
+\end{itemdescr}
+
+\rSec4[time.zone.tzdb.access]{Time zone database access}
+
+\indexlibrary{\idxcode{get_tzdb_list}}%
+\begin{itemdecl}
+tzdb_list& get_tzdb_list();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+If this is the first access to the time zone database,
+initializes the database.
+If this call initializes the database,
+the resulting database will be a \tcode{tzdb_list}
+holding a single initialized \tcode{tzdb}.
+
+\pnum
+\returns
+A reference to the database.
+
+\pnum
+\remarks
+It is safe to call this function from multiple threads at one time.
+
+\pnum
+\throws
+\tcode{runtime_error} if for any reason
+a reference can not be returned to a valid \tcode{tzdb_list}
+containing one or more valid \tcode{tzdb}s.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{get_tzdb}}%
+\begin{itemdecl}
+const tzdb& get_tzdb();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{get_tzdb_list().front()}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{locate_zone}}%
+\begin{itemdecl}
+const time_zone* locate_zone(string_view tz_name);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{get_tzdb().locate_zone(tz_name)}.
+
+\pnum
+\begin{note}
+The time zone database will be initialized
+if this is the first reference to the database.
+\end{note}
+\end{itemdescr}
+
+\indexlibrary{\idxcode{current_zone}}%
+\begin{itemdecl}
+const time_zone* current_zone();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{get_tzdb().current_zone()}.
+\end{itemdescr}
+
+\rSec4[time.zone.db.remote]{Remote time zone database support}
+
+\pnum
+The local time zone database
+is that supplied by the implementation
+when the program first accesses the database,
+for example via \tcode{current_zone()}.
+While the program is running,
+the implementation may choose to update the time zone database.
+This update shall not impact the program in any way
+unless the program calls the functions in this section.
+This potentially updated time zone database
+is referred to as the \defn{remote time zone database}.
+
+\indexlibrary{\idxcode{reload_tzdb}}%
+\begin{itemdecl}
+const tzdb& reload_tzdb();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+This function first checks
+the version of the remote time zone database.
+If the versions of the local and remote databases are the same,
+there are no effects.
+Otherwise the remote database is pushed
+to the front of the \tcode{tzdb_list}
+accessed by \tcode{get_tzdb_list()}.
+
+\pnum
+\returns \tcode{get_tzdb_list().front()}.
+
+\pnum
+\remarks
+No pointers, references, or iterators are invalidated.
+
+\pnum
+\remarks
+This function is thread-safe with respect to
+\tcode{get_tzdb_list().front()} and \tcode{get_tzdb_list().erase_after()}.
+
+\pnum
+\throws
+\tcode{runtime_error} if for any reason
+a reference can not be returned to a valid \tcode{tzdb}.
+\end{itemdescr}
+
+\indexlibrary{\idxcode{remote_version}}%
+\begin{itemdecl}
+string remote_version();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The latest remote database version.
+
+\begin{note}
+This can be compared with \tcode{get_tzdb().version}
+to discover if the local and remote databases are equivalent.
+\end{note}
+\end{itemdescr}
+
+\rSec3[time.zone.exception]{Exception classes}
+
+\rSec4[time.zone.exception.nonexist]{Class \tcode{nonexistent_local_time}}
+\indexlibrary{\idxcode{nonexistent_local_time}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class nonexistent_local_time : public runtime_error {
+  public:
+    template<class Duration>
+      nonexistent_local_time(const local_time<Duration>& tp, const local_info& i);
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{nonexistent_local_time} is thrown when
+an attempt is made
+to convert a non-existent \tcode{local_time} to a \tcode{sys_time}
+without specifying \tcode{choose::earliest} or \tcode{choose::latest}.
+
+\indexlibrary{\idxcode{nonexistent_local_time}!constructor}%
+\begin{itemdecl}
+template<class Duration>
+  nonexistent_local_time(const local_time<Duration>& tp, const local_info& i);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\requires \tcode{i.result == local_info::nonexistent}.
+
+\pnum
+\effects
+Constructs a \tcode{nonexistent_local_time}
+by initializing the base class with a sequence of \tcode{char}
+equivalent to that produced by \tcode{os.str()}
+initialized as shown below:
+
+\begin{codeblock}
+ostringstream os;
+os << tp << " is in a gap between\n"
+   << local_seconds{i.first.end.time_since_epoch()} + i.first.offset << ' '
+   << i.first.abbrev << " and\n"
+   << local_seconds{i.second.begin.time_since_epoch()} + i.second.offset << ' '
+   << i.second.abbrev
+   << " which are both equivalent to\n"
+   << i.first.end << " UTC";
+\end{codeblock}
+
+\pnum
+\begin{example}
+\begin{codeblock}
+#include <chrono>
+#include <iostream>
+
+int main() {
+  using namespace std::chrono;
+  try {
+    auto zt = zoned_time{"America/New_York",
+                         local_days{Sunday[2]/March/2016} + 2h + 30min};
+  } catch (const nonexistent_local_time& e) {
+    std::cout << e.what() << '\n';
+  }
+}
+\end{codeblock}
+
+Produces the output:
+
+\begin{codeblock}
+2016-03-13 02:30:00 is in a gap between
+2016-03-13 02:00:00 EST and
+2016-03-13 03:00:00 EDT which are both equivalent to
+2016-03-13 07:00:00 UTC
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\rSec4[time.zone.exception.ambig]{Class \tcode{ambiguous_local_time}}
+\indexlibrary{\idxcode{ambiguous_local_time}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class ambiguous_local_time : public runtime_error {
+  public:
+    template<class Duration>
+      ambiguous_local_time(const local_time<Duration>& tp, const local_info& i);
+  };
+}
+\end{codeblock}
+
+\pnum
+\tcode{ambiguous_local_time} is thrown when
+an attempt is made
+to convert an ambiguous \tcode{local_time} to a \tcode{sys_time}
+without specifying \tcode{choose::earliest} or \tcode{choose::latest}.
+
+\indexlibrary{\idxcode{ambiguous_local_time}!constructor}%
+\begin{itemdecl}
+template<class Duration>
+  ambiguous_local_time(const local_time<Duration>& tp, const local_info& i);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\requires \tcode{i.result == local_info::ambiguous}.
+
+\pnum
+\effects
+Constructs an \tcode{ambiguous_local_time}
+by initializing the base class with a sequence of \tcode{char}
+equivalent to that produced by \tcode{os.str()}
+initialized as shown below:
+
+\begin{codeblock}
+ostringstream os;
+os << tp << " is ambiguous.  It could be\n"
+   << tp << ' ' << i.first.abbrev << " == "
+   << tp - i.first.offset << " UTC or\n"
+   << tp << ' ' << i.second.abbrev  << " == "
+   << tp - i.second.offset  << " UTC";
+\end{codeblock}
+
+\pnum
+\begin{example}
+\begin{codeblock}
+#include <chrono>
+#include <iostream>
+
+int main() {
+  using namespace std::chrono;
+  try {
+    auto zt = zoned_time{"America/New_York",
+                         local_days{Sunday[1]/November/2016} + 1h + 30min};
+  } catch (const ambiguous_local_time& e) {
+    std::cout << e.what() << '\n';
+  }
+}
+\end{codeblock}
+
+Produces the output:
+
+\begin{codeblock}
+2016-11-06 01:30:00 is ambiguous.  It could be
+2016-11-06 01:30:00 EDT == 2016-11-06 05:30:00 UTC or
+2016-11-06 01:30:00 EST == 2016-11-06 06:30:00 UTC
+\end{codeblock}
+\end{example}
+\end{itemdescr}
+
+\rSec3[time.zone.info]{Information classes}
+
+\rSec4[time.zone.info.sys]{Class \tcode{sys_info}}
+\indexlibrary{\idxcode{sys_info}}
+
+\begin{codeblock}
+namespace std::chrono {
+  struct sys_info {
+    sys_seconds   begin;
+    sys_seconds   end;
+    seconds       offset;
+    minutes       save;
+    string        abbrev;
+  };
+}
+\end{codeblock}
+
+\pnum
+A \tcode{sys_info} structure can be obtained
+from the combination of a \tcode{time_zone} and
+either a \tcode{sys_time} or \tcode{local_time}.
+It can also be obtained from a \tcode{zoned_time},
+which is effectively a pair of a \tcode{time_zone} and \tcode{sys_time}.
+
+\pnum
+\begin{note}
+This type provides a low-level interface to time zone information.
+Typical conversions from \tcode{sys_time} to \tcode{local_time}
+will use this structure implicitly, not explicitly.
+\end{note}
+
+\pnum
+\indexlibrarymember{begin}{sys_info}%
+\indexlibrarymember{end}{sys_info}%
+The \tcode{begin} and \tcode{end} data members indicate that,
+for the associated \tcode{time_zone} and \tcode{time_point},
+the \tcode{offset} and \tcode{abbrev} are in effect in the range \range{begin}{end}.
+This information can be used to efficiently iterate the transitions of a \tcode{time_zone}.
+
+\pnum
+\indexlibrarymember{offset}{sys_info}%
+The \tcode{offset} data member indicates
+the UTC offset in effect
+for the associated \tcode{time_zone} and \tcode{time_point}.
+The relationship between \tcode{local_time} and \tcode{sys_time} is:
+
+\begin{codeblock}
+offset = local_time - sys_time
+\end{codeblock}
+
+\pnum
+\indexlibrarymember{save}{sys_info}%
+The \tcode{save} data member is extra information not normally needed
+for conversion between \tcode{local_time} and \tcode{sys_time}.
+If \tcode{save != 0min}, this \tcode{sys_info} is said to be on ``daylight saving'' time,
+and \tcode{offset - save} suggests what offset this \tcode{time_zone} might use
+if it were off daylight saving time.
+However, this information should not be taken as authoritative.
+The only sure way to get such information
+is to query the \tcode{time_zone} with a \tcode{time_point}
+that returns a \tcode{sys_info} where \tcode{save == 0min}.
+There is no guarantee what \tcode{time_point} might return such a \tcode{sys_info}
+except that it is guaranteed not to be in the range \range{begin}{end}
+(if \tcode{save != 0min} for this \tcode{sys_info}).
+
+\pnum
+\indexlibrarymember{abbrev}{sys_info}%
+The \tcode{abbrev} data member indicates
+the current abbreviation used for the associated \tcode{time_zone} and \tcode{time_point}.
+Abbreviations are not unique among the \tcode{time_zones},
+and so one can not reliably map abbreviations back to a \tcode{time_zone} and UTC offset.
+
+\indexlibrarymember{operator<<}{sys_info}
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const sys_info& r);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects 
+Streams out the \tcode{sys_info} object \tcode{r} in an unspecified format.
+\end{itemdescr}
+
+\rSec4[time.zone.info.local]{Class \tcode{local_info}}
+\indexlibrary{\idxcode{local_info}}
+
+\indexlibrarymember{unique}{local_info}%
+\indexlibrarymember{nonexistent}{local_info}%
+\indexlibrarymember{ambiguous}{local_info}%
+\indexlibrarymember{result}{local_info}%
+\indexlibrarymember{first}{local_info}%
+\indexlibrarymember{second}{local_info}%
+\begin{codeblock}
+namespace std::chrono {
+  struct local_info {
+    static constexpr int unique      = 0;
+    static constexpr int nonexistent = 1;
+    static constexpr int ambiguous   = 2;
+
+    int result;
+    sys_info first;
+    sys_info second;
+  };
+}
+\end{codeblock}
+
+\pnum
+\begin{note}
+This type provides a low-level interface to time zone information.
+Typical conversions from \tcode{local_time} to \tcode{sys_time}
+will use this structure implicitly, not explicitly.
+\end{note}
+
+\pnum
+Describes the result of converting a \tcode{local_time} to a \tcode{sys_time}
+as follows:
+\begin{itemize}
+\item
+When a \tcode{local_time} to \tcode{sys_time} conversion is unique,
+\tcode{result == unique},
+\tcode{first} will be filled out with the correct \tcode{sys_info},
+and
+\tcode{second} will be zero-initialized.
+
+\item
+If the conversion stems from a nonexistent \tcode{local_time}
+then \tcode{result == nonexistent},
+\tcode{first} will be filled out with the \tcode{sys_info}
+that ends just prior to the \tcode{local_time},
+and
+\tcode{second} will be filled out with the \tcode{sys_info}
+that begins just after the \tcode{local_time}.
+
+\item
+If the conversion stems from an ambiguous \tcode{local_time},
+then \tcode{result == ambiguous},
+\tcode{first} will be filled out with the \tcode{sys_info}
+that ends just after the \tcode{local_time},
+and
+\tcode{second} will be filled out with the \tcode{sys_info}
+that starts just before the \tcode{local_time}.
+\end{itemize}
+
+\indexlibrarymember{operator<<}{local_info}%
+\begin{itemdecl}
+template<class charT, class traits>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os, const local_info& r);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+Streams out the \tcode{local_info} object \tcode{r} in an unspecified format.
+\end{itemdescr}
+
+\rSec3[time.zone.timezone]{Class \tcode{time_zone}}
+
+\rSec4[time.zone.overview]{Overview}
+\indexlibrary{\idxcode{time_zone}}
+
+\begin{codeblock}
+namespace std::chrono {
+  class time_zone {
+  public:
+    time_zone(time_zone&&) = default;
+    time_zone& operator=(time_zone&&) = default;
+
+    // unspecified additional constructors
+
+    string_view name() const noexcept;
+
+    template<class Duration> sys_info   get_info(const sys_time<Duration>& st)   const;
+    template<class Duration> local_info get_info(const local_time<Duration>& tp) const;
+
+    template<class Duration>
+      sys_time<common_type_t<Duration, seconds>>
+        to_sys(const local_time<Duration>& tp) const;
+
+    template<class Duration>
+      sys_time<common_type_t<Duration, seconds>>
+        to_sys(const local_time<Duration>& tp, choose z) const;
+
+    template<class Duration>
+      local_time<common_type_t<Duration, seconds>>
+        to_local(const sys_time<Duration>& tp) const;
+  };
+}
+\end{codeblock}
+
+\pnum
+A \tcode{time_zone} represents all time zone transitions
+for a specific geographic area.
+\tcode{time_zone} construction is unspecified,
+and performed as part of database initialization.
+\begin{note}
+\tcode{const time_zone} objects can be accessed
+via functions such as \tcode{locate_zone}.
+\end{note}
+
+\rSec4[time.zone.members]{Member functions}
+
+\indexlibrarymember{name}{time_zone}%
+\begin{itemdecl}
+string_view name() const noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns The name of the \tcode{time_zone}.
+
+\pnum
+\begin{example}
+\tcode{"America/New_York"}.
+\end{example}
+\end{itemdescr}
+
+\indexlibrarymember{get_info}{time_zone}%
+\begin{itemdecl}
+template<class Duration>
+  sys_info get_info(const sys_time<Duration>& st) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A \tcode{sys_info} \tcode{i} for which
+\tcode{st} is in the range \range{i.begin}{i.end}.
+\end{itemdescr}
+
+\indexlibrarymember{get_info}{time_zone}%
+\begin{itemdecl}
+template<class Duration>
+  local_info get_info(const local_time<Duration>& tp) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A \tcode{local_info} for \tcode{tp}.
+\end{itemdescr}
+
+\indexlibrarymember{to_sys}{time_zone}%
+\begin{itemdecl}
+template<class Duration>
+  sys_time<common_type_t<Duration, seconds>>
+    to_sys(const local_time<Duration>& tp) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A \tcode{sys_time} that is at least as fine as \tcode{seconds},
+and will be finer if the argument \tcode{tp} has finer precision.
+This \tcode{sys_time} is the UTC equivalent of \tcode{tp}
+according to the rules of this \tcode{time_zone}.
+
+\pnum
+\throws
+If the conversion from \tcode{tp} to a \tcode{sys_time} is ambiguous,
+throws \tcode{ambiguous_local_time}.
+If the \tcode{tp} represents a non-existent time between two UTC \tcode{time_points},
+throws \tcode{nonexistent_local_time}.
+\end{itemdescr}
+
+\indexlibrarymember{to_sys}{time_zone}%
+\begin{itemdecl}
+template<class Duration>
+  sys_time<common_type_t<Duration, seconds>>
+    to_sys(const local_time<Duration>& tp, choose z) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+A \tcode{sys_time} that is at least as fine as \tcode{seconds},
+and will be finer if the argument \tcode{tp} has finer precision.
+This \tcode{sys_time} is the UTC equivalent of \tcode{tp}
+according to the rules of this \tcode{time_zone}.
+If the conversion from \tcode{tp} to a \tcode{sys_time} is ambiguous,
+returns the earlier \tcode{sys_time} if \tcode{z == choose::earliest}, and
+returns the later \tcode{sys_time} if \tcode{z == choose::latest}.
+If the \tcode{tp} represents a non-existent time between two UTC \tcode{time_points},
+then the two UTC \tcode{time_points} will be the same,
+and that UTC \tcode{time_point} will be returned.
+\end{itemdescr}
+
+\indexlibrarymember{to_local}{time_zone}%
+\begin{itemdecl}
+template<class Duration>
+  local_time<common_type_t<Duration, seconds>>
+    to_local(const sys_time<Duration>& tp) const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns
+The \tcode{local_time} associated with \tcode{tp} and this \tcode{time_zone}.
+\end{itemdescr}
+
+\rSec4[time.zone.nonmembers]{Non-member functions}
+
+\indexlibrarymember{operator==}{time_zone}%
+\begin{itemdecl}
+bool operator==(const time_zone& x, const time_zone& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.name() == y.name()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<}{time_zone}%
+\begin{itemdecl}
+bool operator<(const time_zone& x, const time_zone& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.name() < y.name()}.
+\end{itemdescr}
+
+\rSec3[time.zone.zonedtraits]{Class template \tcode{zoned_traits}}
+\indexlibrary{\idxcode{zoned_traits}}
+
+\begin{codeblock}
+namespace std::chrono {
+  template<class T> struct zoned_traits {};
+}
+\end{codeblock}
+
+\pnum
+\tcode{zoned_traits} provides a means for customizing
+the behavior of \tcode{zoned_time<Duration, TimeZonePtr>}
+for the \tcode{zoned_time} default constructor,
+and constructors taking \tcode{string_view}.
+A specialization for \tcode{const time_zone*} is provided by the implementation:
+
+\begin{codeblock}
+namespace std::chrono {
+  template<> struct zoned_traits<const time_zone*> {
+    static const time_zone* default_zone();
+    static const time_zone* locate_zone(string_view name);
+  };
+}
+\end{codeblock}
+
+\indexlibrarymember{default_zone}{zoned_traits<const time_zone*>}%
+\begin{itemdecl}
+static const time_zone* default_zone();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{std::chrono::locate_zone("UTC")}.
+\end{itemdescr}
+
+\indexlibrarymember{locate_zone}{zoned_traits<const time_zone*>}%
+\begin{itemdecl}
+static const time_zone* locate_zone(string_view name);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{std::chrono::locate_zone(name)}.
+\end{itemdescr}
+
+\rSec3[time.zone.zonedtime]{Class template \tcode{zoned_time}}
+
+\rSec4[time.zone.zonedtime.overview]{Overview}
+\indexlibrary{\idxcode{zoned_time}}
+
+\begin{codeblock}
+namespace std::chrono {
+  template<class Duration, class TimeZonePtr = const time_zone*>
+  class zoned_time {
+  public:
+    using duration = common_type_t<Duration, seconds>;
+
+  private:
+    TimeZonePtr        zone_;                   // \expos
+    sys_time<duration> tp_;                     // \expos
+
+    using traits = zoned_traits<TimeZonePtr>;   // \expos
+
+  public:
+    zoned_time();
+    zoned_time(const zoned_time&) = default;
+    zoned_time& operator=(const zoned_time&) = default;
+
+    zoned_time(const sys_time<Duration>& st);
+    explicit zoned_time(TimeZonePtr z);
+    explicit zoned_time(string_view name);
+
+    template<class Duration2>
+      zoned_time(const zoned_time<Duration2>& zt) noexcept;
+
+    zoned_time(TimeZonePtr z,    const sys_time<Duration>& st);
+    zoned_time(string_view name, const sys_time<Duration>& st);
+
+    zoned_time(TimeZonePtr z,    const local_time<Duration>& tp);
+    zoned_time(string_view name, const local_time<Duration>& tp);
+    zoned_time(TimeZonePtr z,    const local_time<Duration>& tp, choose c);
+    zoned_time(string_view name, const local_time<Duration>& tp, choose c);
+
+    template<class Duration2, class TimeZonePtr2>
+      zoned_time(TimeZonePtr z, const zoned_time<Duration2, TimeZonePtr2>& zt);
+    template<class Duration2, class TimeZonePtr2>
+      zoned_time(TimeZonePtr z, const zoned_time<Duration2, TimeZonePtr2>& zt, choose);
+
+    zoned_time(string_view name, const zoned_time<Duration>& zt);
+    zoned_time(string_view name, const zoned_time<Duration>& zt, choose);
+
+    zoned_time& operator=(const sys_time<Duration>& st);
+    zoned_time& operator=(const local_time<Duration>& ut);
+
+    operator sys_time<duration>() const;
+    explicit operator local_time<duration>() const;
+
+    TimeZonePtr          get_time_zone()  const;
+    local_time<duration> get_local_time() const;
+    sys_time<duration>   get_sys_time()   const;
+    sys_info             get_info()       const;
+  };
+
+  zoned_time() -> zoned_time<seconds>;
+
+  template<class Duration>
+    zoned_time(sys_time<Duration>)
+      -> zoned_time<common_type_t<Duration, seconds>>;
+
+  template<class TimeZonePtr, class Duration>
+    zoned_time(TimeZonePtr, sys_time<Duration>)
+      -> zoned_time<common_type_t<Duration, seconds>, TimeZonePtr>;
+
+  template<class TimeZonePtr, class Duration>
+    zoned_time(TimeZonePtr, local_time<Duration>, choose = choose::earliest)
+      -> zoned_time<common_type_t<Duration, seconds>, TimeZonePtr>;
+
+  template<class TimeZonePtr, class Duration>
+    zoned_time(TimeZonePtr, zoned_time<Duration>, choose = choose::earliest)
+      -> zoned_time<common_type_t<Duration, seconds>, TimeZonePtr>;
+
+  zoned_time(string_view) -> zoned_time<seconds>;
+
+  template<class Duration>
+    zoned_time(string_view, sys_time<Duration>)
+      -> zoned_time<common_type_t<Duration, seconds>>;
+
+  template<class Duration>
+    zoned_time(string_view, local_time<Duration>, choose = choose::earliest)
+      -> zoned_time<common_type_t<Duration, seconds>>;
+
+  template<class Duration, class TimeZonePtr, class TimeZonePtr2>
+    zoned_time(TimeZonePtr, zoned_time<Duration, TimeZonePtr2>, choose = choose::earliest)
+      -> zoned_time<Duration, TimeZonePtr>;
+}
+\end{codeblock}
+
+\pnum
+\tcode{zoned_time} represents a logical pairing of
+a \tcode{time_zone} and a \tcode{time_point} with precision \tcode{Duration}.
+\tcode{zoned_time<Duration>} maintains the invariant that
+it always refers to a valid time zone and
+represents a point in time that exists and is not ambiguous
+in that time zone.
+
+\pnum
+If \tcode{Duration} is not a specialization of \tcode{chrono::duration},
+the program is ill-formed.
+
+\rSec4[time.zone.zonedtime.ctor]{Constructors}
+
+\indexlibrary{\idxcode{zoned_time}!constructor|(}%
+\begin{itemdecl}
+zoned_time();
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{traits::default_zone()} is a well-formed expression.
+
+\pnum
+\effects
+Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{traits::default_zone()} and
+default constructing \tcode{tp_}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(const sys_time<Duration>& st);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{traits::default_zone()} is a well-formed expression.
+
+\pnum
+\effects
+Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{traits::default_zone()} and \tcode{tp_} with \tcode{st}.
+\end{itemdescr}
+
+\begin{itemdecl}
+explicit zoned_time(TimeZonePtr z);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\requires \tcode{z} refers to a time zone.
+
+\pnum
+\effects Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{std::move(z)}.
+% FIXME: What about tp_?
+\end{itemdescr}
+
+\begin{itemdecl}
+explicit zoned_time(string_view name);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{traits::locate_zone(string_view\{\})} is a well-formed expression and
+\tcode{zoned_time} is constructible from the return type of \tcode{traits::locate_zone(string_view\{\})}.
+
+\pnum
+\effects
+Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{traits::locate_zone(name)} and
+default constructing \tcode{tp_}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template<class Duration2, TimeZonePtr2>
+  zoned_time(const zoned_time<Duration2, TimeZonePtr>& y) noexcept;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+Does not participate in overload resolution unless
+\tcode{sys_time<Duration2>} is implicitly convertible to \tcode{sys_time<Duration>}.
+
+\pnum
+\effects
+Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{y.zone_} and \tcode{tp_} with \tcode{y.tp_}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(TimeZonePtr z, const sys_time<Duration>& st);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\requires \tcode{z} refers to a time zone.
+
+\pnum
+\effects
+Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{std::move(z)} and \tcode{tp_} with \tcode{st}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(string_view name, const sys_time<Duration>& st);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{zoned_time} is constructible from the return type of \tcode{traits::locate_zone(name)} and \tcode{st}.
+
+\pnum
+\effects
+Equivalent to construction with \tcode{\{traits::locate_zone(name), st\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(TimeZonePtr z, const local_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\requires \tcode{z} refers to a time zone.
+
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\begin{codeblock}
+declval<TimeZonePtr&>()->to_sys(local_time<Duration>{})
+\end{codeblock}
+is convertible to \tcode{sys_time<duration>}.
+
+\pnum
+\effects
+Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{std::move(z)} and \tcode{tp_} with \tcode{zone_->to_sys(tp)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(string_view name, const local_time<Duration>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{zoned_time} is constructible from the return type of \tcode{traits::locate_zone(name)} and \tcode{tp}.
+
+\pnum
+\effects
+Equivalent to construction with \tcode{\{traits::locate_zone(name), tp\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(TimeZonePtr z, const local_time<Duration>& tp, choose c);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\requires \tcode{z} refers to a time zone.
+
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\begin{codeblock}
+decltype(declval<TimeZonePtr&>()->to_sys(local_time<Duration>{}, choose::earliest))
+\end{codeblock}
+is convertible to \tcode{sys_time<duration>}.
+
+\pnum
+\effects
+Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{std::move(z)} and \tcode{tp_} with \tcode{zone_->to_sys(tp, c)}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(string_view name, const local_time<Duration>& tp, choose c);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{zoned_time} is constructible from
+the return type of \tcode{traits::locate_zone(name)}, \tcode{local_time<Duration>}, and \tcode{choose}.
+
+\pnum
+\effects
+Equivalent to construction with \tcode{\{traits::locate_zone(name), tp, c\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template<class Duration2, TimeZonePtr2>
+  zoned_time(TimeZonePtr z, const zoned_time<Duration2, TimeZonePtr2>& y);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+Does not participate in overload resolution unless
+\tcode{sys_time<Duration2>} is implicitly convertible to \tcode{sys_time<Duration>}.
+
+\pnum
+\requires \tcode{z} refers to a valid time zone.
+
+\pnum
+\effects Constructs a \tcode{zoned_time} by
+initializing \tcode{zone_} with \tcode{std::move(z)} and \tcode{tp_} with \tcode{y.tp_}.
+\end{itemdescr}
+
+\begin{itemdecl}
+template<class Duration2, TimeZonePtr2>
+  zoned_time(TimeZonePtr z, const zoned_time<Duration2, TimeZonePtr2>& y, choose);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+Does not participate in overload resolution unless
+\tcode{sys_time<Duration2>} is implicitly convertible to \tcode{sys_time<Duration>}.
+
+\pnum
+\requires \tcode{z} refers to a valid time zone.
+
+\pnum
+\effects
+Equivalent to construction with \tcode{\{z, y\}}.
+
+\pnum
+\begin{note}
+The \tcode{choose} parameter has no effect.
+\end{note}
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(string_view name, const zoned_time<Duration>& y);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{zoned_time} is constructible from the return type of \tcode{traits::locate_zone(name)} and \tcode{zoned_time}.
+
+\pnum
+\effects
+Equivalent to construction with \tcode{\{traits::locate_zone(name), y\}}.
+\end{itemdescr}
+
+\begin{itemdecl}
+zoned_time(string_view name, const zoned_time<Duration>& y, choose c);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\remarks
+This constructor does not participate in overload resolution unless
+\tcode{zoned_time} is constructible from
+the return type of \tcode{traits::locate_zone(name)}, \tcode{zoned_time}, and \tcode{choose}.
+
+\pnum
+\effects
+Equivalent to construction with \tcode{\{traits::locate_zone(name), y, c\}}.
+
+\pnum
+\begin{note}
+The \tcode{choose} parameter has no effect.
+\end{note}
+\end{itemdescr}
+\indexlibrary{\idxcode{zoned_time}!constructor|)}%
+
+\rSec4[time.zone.zonedtime.members]{Member functions}
+
+\indexlibrarymember{operator=}{zoned_time}%
+\begin{itemdecl}
+zoned_time& operator=(const sys_time<Duration>& st);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+After assignment, \tcode{get_sys_time() == st}.
+This assignment has no effect on the return value of \tcode{get_time_zone()}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator=}{zoned_time}%
+\begin{itemdecl}
+zoned_time& operator=(const local_time<Duration>& lt);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+After assignment, \tcode{get_local_time() == lt}.
+This assignment has no effect on the return value of \tcode{get_time_zone()}.
+
+\pnum
+\returns \tcode{*this}.
+\end{itemdescr}
+
+\indexlibrarymember{operator sys_time}{zoned_time}%
+\begin{itemdecl}
+operator sys_time<duration>() const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{get_sys_time()}.
+\end{itemdescr}
+
+\indexlibrarymember{operator local_time}{zoned_time}%
+\begin{itemdecl}
+explicit operator local_time<duration>() const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{get_local_time()}.
+\end{itemdescr}
+
+\indexlibrarymember{get_time_zone}{zoned_time}%
+\begin{itemdecl}
+TimeZonePtr get_time_zone() const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{zone_}.
+\end{itemdescr}
+
+\indexlibrarymember{get_local_time}{zoned_time}%
+\begin{itemdecl}
+local_time<duration> get_local_time() const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{zone_->to_local(tp_)}.
+\end{itemdescr}
+
+\indexlibrarymember{get_sys_time}{zoned_time}%
+\begin{itemdecl}
+sys_time<duration> get_sys_time() const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{tp_}.
+\end{itemdescr}
+
+\indexlibrarymember{get_info}{zoned_time}%
+\begin{itemdecl}
+sys_info get_info() const;
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{zone_->get_info(tp_)}.
+\end{itemdescr}
+
+\rSec4[time.zone.zonedtime.nonmembers]{Non-member functions}
+
+\indexlibrarymember{operator==}{zoned_time}%
+\begin{itemdecl}
+template<class Duration1, class Duration2, class TimeZonePtr>
+  bool operator==(const zoned_time<Duration1, TimeZonePtr>& x,
+                  const zoned_time<Duration2, TimeZonePtr>& y);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\returns \tcode{x.zone_ == y.zone_ \&\& x.tp_ == y.tp_}.
+\end{itemdescr}
+
+\indexlibrarymember{operator<<}{zoned_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class TimeZonePtr>
+  basic_ostream<charT, traits>&
+    operator<<(basic_ostream<charT, traits>& os,
+               const zoned_time<Duration, TimeZonePtr>& t)
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+Streams
+the value returned from \tcode{t.get_local_time()}
+to \tcode{os}
+using the format \tcode{"\%F \%T \%Z"}.
+
+\pnum
+\returns \tcode{os}.
+\end{itemdescr}
+
+\indexlibrarymember{to_stream}{zoned_time}%
+\begin{itemdecl}
+template<class charT, class traits, class Duration, class TimeZonePtr>
+  basic_ostream<charT, traits>&
+    to_stream(basic_ostream<charT, traits>& os, const charT* fmt,
+              const zoned_time<Duration, TimeZonePtr>& tp);
+\end{itemdecl}
+
+\begin{itemdescr}
+\pnum
+\effects
+First obtains a \tcode{sys_info} via \tcode{tp.get_info()}
+which for exposition purposes will be referred to as \tcode{info}.
+Then calls \tcode{to_stream(os, fmt, tp.get_local_time(), \&info.abbrev, \&info.offset)}.
+
+\pnum
+\returns \tcode{os}.
 \end{itemdescr}
 
 \rSec2[time.format]{Formatting}
